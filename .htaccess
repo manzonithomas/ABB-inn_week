@@ -1,0 +1,11 @@
+# Blocca accesso diretto a file sensibili
+<FilesMatch "(config\.php|auth\.php|composer\.json|composer\.lock|schema\.sql|README\.md)$">
+    Order Allow,Deny
+    Deny from all
+</FilesMatch>
+
+# Blocca directory listing
+Options -Indexes
+
+# Abilita URL rewriting (opzionale, per URL puliti in futuro)
+# RewriteEngine On

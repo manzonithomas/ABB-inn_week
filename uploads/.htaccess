@@ -1,0 +1,12 @@
+# Blocca esecuzione di script PHP nella cartella uploads
+# Sicurezza: evita che PDF malevoli vengano eseguiti come PHP
+<FilesMatch "\.php$">
+    Order Allow,Deny
+    Deny from all
+</FilesMatch>
+
+# Permetti solo PDF
+<FilesMatch "\.pdf$">
+    Order Deny,Allow
+    Allow from all
+</FilesMatch>
