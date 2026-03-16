@@ -10,9 +10,13 @@ define('DB_USER', 'root');
 define('DB_PASS', '');
 define('DB_CHARSET', 'utf8mb4');
 
-// --- URL base (senza trailing slash) ---
-// Cambiare in produzione con l'URL reale
-define('BASE_URL', 'http://localhost/thomas/Abb-tarature');
+// --- URL base (dinamico, senza trailing slash) ---
+define('BASE_URL', rtrim(
+    (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http')
+    . '://' . ($_SERVER['HTTP_HOST'] ?? 'localhost')
+    . dirname($_SERVER['SCRIPT_NAME']),
+    '/admin/public/cron'
+));
 
 // --- Filesystem ---
 define('ROOT_DIR', __DIR__);

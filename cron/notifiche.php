@@ -20,8 +20,8 @@ require_once dirname(__DIR__) . '/config.php';
 // Carica Composer autoload (PHPMailer)
 $autoload = dirname(__DIR__) . '/vendor/autoload.php';
 if (!file_exists($autoload)) {
-    echo "[ERRORE] vendor/autoload.php non trovato. Esegui: composer install\n";
-    exit(1);
+  echo "[ERRORE] vendor/autoload.php non trovato. Esegui: composer install\n";
+  exit(1);
 }
 require_once $autoload;
 
@@ -38,20 +38,20 @@ use PHPMailer\PHPMailer\Exception;
 //  Per produzione: cambia le costanti qui sotto con le
 //  credenziali del server SMTP reale (es. Gmail, SendGrid...)
 // ============================================================
-define('SMTP_HOST',  'localhost');
-define('SMTP_PORT',  25);
-define('SMTP_AUTH',  false);
-define('SMTP_USER',  '');
-define('SMTP_PASS',  '');
-define('SMTP_FROM',  'calibration@abbdalmine.local');
-define('SMTP_NAME',  'ABB Calibration Manager');
+define('SMTP_HOST', 'localhost');
+define('SMTP_PORT', 25);
+define('SMTP_AUTH', false);
+define('SMTP_USER', '');
+define('SMTP_PASS', '');
+define('SMTP_FROM', 'calibration@abbdalmine.local');
+define('SMTP_NAME', 'ABB Calibration Manager');
 define('SMTP_SECURE', '');  // '' per nessuna crittografia, 'tls' per STARTTLS, 'ssl' per SSL
 
 // ============================================================
 //  MAIN
 // ============================================================
 
-$db  = db();
+$db = db();
 $now = date('Y-m-d H:i:s');
 
 echo "[{$now}] Avvio script notifiche scadenza tarature\n";
@@ -60,28 +60,28 @@ echo "[{$now}] Avvio script notifiche scadenza tarature\n";
 $tarature = $db->query("SELECT * FROM v_tarature_in_scadenza")->fetchAll();
 
 if (empty($tarature)) {
-    echo "[OK] Nessuna taratura in scadenza da notificare.\n";
-    exit(0);
+  echo "[OK] Nessuna taratura in scadenza da notificare.\n";
+  exit(0);
 }
 
 echo "[INFO] Trovate " . count($tarature) . " taratura/e da notificare.\n";
 
-$ok  = 0;
+$ok = 0;
 $err = 0;
 
 foreach ($tarature as $t) {
-    $result = inviaEmail($t);
+  $result = inviaEmail($t);
 
-    if ($result === true) {
-        // Segna notifica inviata
-        $db->prepare("UPDATE tarature SET notifica_inviata = 1 WHERE id = ?")
-           ->execute([$t['taratura_id']]);
-        echo "[OK] Email inviata per '{$t['macchinario_nome']}' a {$t['email_admin']}\n";
-        $ok++;
-    } else {
-        echo "[ERR] Errore per '{$t['macchinario_nome']}': {$result}\n";
-        $err++;
-    }
+  if ($result === true) {
+    // Segna notifica inviata
+    $db->prepare("UPDATE tarature SET notifica_inviata = 1 WHERE id = ?")
+      ->execute([$t['taratura_id']]);
+    echo "[OK] Email inviata per '{$t['macchinario_nome']}' a {$t['email_admin']}\n";
+    $ok++;
+  } else {
+    echo "[ERR] Errore per '{$t['macchinario_nome']}': {$result}\n";
+    $err++;
+  }
 }
 
 echo "[FINE] Completato. OK: {$ok}, Errori: {$err}\n";
@@ -89,60 +89,62 @@ echo "[FINE] Completato. OK: {$ok}, Errori: {$err}\n";
 // ============================================================
 //  Funzione invio singola email
 // ============================================================
-function inviaEmail(array $t): true|string {
-    $mail = new PHPMailer(true);
+function inviaEmail(array $t): bool|string
+{
+  $mail = new PHPMailer(true);
 
-    try {
-        // --- Server SMTP ---
-        $mail->isSMTP();
-        $mail->Host       = SMTP_HOST;
-        $mail->Port       = SMTP_PORT;
-        $mail->SMTPAuth   = SMTP_AUTH;
-        if (SMTP_AUTH) {
-            $mail->Username = SMTP_USER;
-            $mail->Password = SMTP_PASS;
-        }
-        if (SMTP_SECURE !== '') {
-            $mail->SMTPSecure = SMTP_SECURE;
-        } else {
-            $mail->SMTPAutoTLS = false;
-        }
-        $mail->CharSet = 'UTF-8';
-
-        // --- Mittente / Destinatario ---
-        $mail->setFrom(SMTP_FROM, SMTP_NAME);
-        $mail->addAddress($t['email_admin']);
-        $mail->addReplyTo(SMTP_FROM, SMTP_NAME);
-
-        // --- Soggetto ---
-        $giorni  = (int)$t['giorni_rimanenti'];
-        $urgency = $giorni <= 7 ? '🔴 URGENTE — ' : '⚠️ ';
-        $mail->Subject = "{$urgency}Taratura in scadenza: {$t['macchinario_nome']} ({$giorni} giorni)";
-
-        // --- Corpo HTML ---
-        $mail->isHTML(true);
-        $mail->Body    = buildEmailHtml($t);
-        $mail->AltBody = buildEmailText($t);
-
-        $mail->send();
-        return true;
-
-    } catch (Exception $e) {
-        return $mail->ErrorInfo;
+  try {
+    // --- Server SMTP ---
+    $mail->isSMTP();
+    $mail->Host = SMTP_HOST;
+    $mail->Port = SMTP_PORT;
+    $mail->SMTPAuth = SMTP_AUTH;
+    if (SMTP_AUTH) {
+      $mail->Username = SMTP_USER;
+      $mail->Password = SMTP_PASS;
     }
+    if (SMTP_SECURE !== '') {
+      $mail->SMTPSecure = SMTP_SECURE;
+    } else {
+      $mail->SMTPAutoTLS = false;
+    }
+    $mail->CharSet = 'UTF-8';
+
+    // --- Mittente / Destinatario ---
+    $mail->setFrom(SMTP_FROM, SMTP_NAME);
+    $mail->addAddress($t['email_admin']);
+    $mail->addReplyTo(SMTP_FROM, SMTP_NAME);
+
+    // --- Soggetto ---
+    $giorni = (int) $t['giorni_rimanenti'];
+    $urgency = $giorni <= 7 ? '🔴 URGENTE — ' : '⚠️ ';
+    $mail->Subject = "{$urgency}Taratura in scadenza: {$t['macchinario_nome']} ({$giorni} giorni)";
+
+    // --- Corpo HTML ---
+    $mail->isHTML(true);
+    $mail->Body = buildEmailHtml($t);
+    $mail->AltBody = buildEmailText($t);
+
+    $mail->send();
+    return true;
+
+  } catch (Exception $e) {
+    return $mail->ErrorInfo;
+  }
 }
 
 // ============================================================
 //  Template email HTML
 // ============================================================
-function buildEmailHtml(array $t): string {
-    $giorni    = (int)$t['giorni_rimanenti'];
-    $color     = $giorni <= 7 ? '#FF000F' : '#f57f17';
-    $label     = $giorni <= 7 ? 'URGENTE' : 'ATTENZIONE';
-    $scadenza  = date('d/m/Y', strtotime($t['data_scadenza']));
-    $url_mac   = ''; // opzionale: aggiungere link alla pagina pubblica
+function buildEmailHtml(array $t): string
+{
+  $giorni = (int) $t['giorni_rimanenti'];
+  $color = $giorni <= 7 ? '#FF000F' : '#f57f17';
+  $label = $giorni <= 7 ? 'URGENTE' : 'ATTENZIONE';
+  $scadenza = date('d/m/Y', strtotime($t['data_scadenza']));
+  $url_mac = ''; // opzionale: aggiungere link alla pagina pubblica
 
-    return '<!DOCTYPE html>
+  return '<!DOCTYPE html>
 <html lang="it">
 <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"></head>
 <body style="margin:0; padding:0; background:#f0f0f0; font-family:Arial, sans-serif;">
@@ -225,19 +227,20 @@ function buildEmailHtml(array $t): string {
 // ============================================================
 //  Template email testo plain
 // ============================================================
-function buildEmailText(array $t): string {
-    $giorni   = (int)$t['giorni_rimanenti'];
-    $scadenza = date('d/m/Y', strtotime($t['data_scadenza']));
+function buildEmailText(array $t): string
+{
+  $giorni = (int) $t['giorni_rimanenti'];
+  $scadenza = date('d/m/Y', strtotime($t['data_scadenza']));
 
-    return "ABB Calibration Manager — Notifica scadenza taratura\n"
-         . str_repeat('=', 50) . "\n\n"
-         . "ATTENZIONE: Taratura in scadenza tra {$giorni} giorni\n\n"
-         . "Macchinario:  {$t['macchinario_nome']}\n"
-         . "Reparto:      {$t['reparto']}\n"
-         . "Data scadenza: {$scadenza}\n\n"
-         . "Accedi al pannello di gestione per rinnovare la taratura:\n"
-         . BASE_URL . "/admin/tarature.php?filter=scadenza\n\n"
-         . str_repeat('-', 50) . "\n"
-         . "ABB S.p.A. — Via Luciano Lama 33, 24044 Dalmine (BG)\n"
-         . "Email automatica — non rispondere.\n";
+  return "ABB Calibration Manager — Notifica scadenza taratura\n"
+    . str_repeat('=', 50) . "\n\n"
+    . "ATTENZIONE: Taratura in scadenza tra {$giorni} giorni\n\n"
+    . "Macchinario:  {$t['macchinario_nome']}\n"
+    . "Reparto:      {$t['reparto']}\n"
+    . "Data scadenza: {$scadenza}\n\n"
+    . "Accedi al pannello di gestione per rinnovare la taratura:\n"
+    . BASE_URL . "/admin/tarature.php?filter=scadenza\n\n"
+    . str_repeat('-', 50) . "\n"
+    . "ABB S.p.A. — Via Luciano Lama 33, 24044 Dalmine (BG)\n"
+    . "Email automatica — non rispondere.\n";
 }
