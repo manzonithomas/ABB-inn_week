@@ -32,6 +32,18 @@ $reparto_f = trim($_GET['reparto'] ?? '');
 $macchinario_f = (int) ($_GET['macchinario_id'] ?? 0);
 $search = trim($_GET['q'] ?? '');
 
+// ---- Ordinamento ----
+$sort_options = [
+    'urgenza' => ['label' => 'Urgenza', 'sql' => "CASE WHEN vt.taratura_id IS NULL THEN 1 WHEN vt.stato_scadenza = 'scaduta' THEN 2 WHEN vt.stato_scadenza = 'in_scadenza' THEN 3 ELSE 4 END ASC, ISNULL(vt.data_scadenza) ASC, vt.data_scadenza ASC"],
+    'scadenza' => ['label' => 'Scadenza', 'sql' => "ISNULL(vt.data_scadenza) ASC, vt.data_scadenza ASC"],
+    'nome' => ['label' => 'Nome macchinario', 'sql' => "vt.macchinario_nome ASC"],
+    'reparto' => ['label' => 'Reparto', 'sql' => "vt.reparto ASC, vt.macchinario_nome ASC"],
+    'inserita' => ['label' => 'Ultima inserita', 'sql' => "ISNULL(vt.data_inserimento) ASC, vt.data_inserimento DESC"],
+];
+$sort = array_key_exists($_GET['sort'] ?? '', $sort_options) ? $_GET['sort'] : 'urgenza';
+$order_sql = $sort_options[$sort]['sql'];
+
+// ---- WHERE ----
 $params = [];
 $where = ['m.attivo = 1'];
 
@@ -65,14 +77,7 @@ $sql = "
     JOIN macchinari m ON m.id = vt.macchinario_id
     JOIN reparti r    ON r.nome = vt.reparto
     WHERE " . implode(' AND ', $where) . "
-    ORDER BY
-        CASE vt.stato_scadenza
-            WHEN 'scaduta'     THEN 1
-            WHEN 'in_scadenza' THEN 2
-            WHEN 'valida'      THEN 3
-            ELSE 4
-        END,
-        vt.data_scadenza ASC
+    ORDER BY $order_sql
 ";
 
 $stmt = $db->prepare($sql);
@@ -91,6 +96,19 @@ $conteggi = $db->query("
 
 $reparti = $db->query("SELECT id, nome FROM reparti ORDER BY nome")->fetchAll();
 $macchinari = $db->query("SELECT id, nome FROM macchinari WHERE attivo=1 ORDER BY nome")->fetchAll();
+
+// Helper: costruisce URL preservando tutti i parametri tranne gli override
+function buildUrl(array $over = []): string
+{
+    $p = array_merge([
+        'filter' => $_GET['filter'] ?? '',
+        'q' => $_GET['q'] ?? '',
+        'reparto' => $_GET['reparto'] ?? '',
+        'macchinario_id' => $_GET['macchinario_id'] ?? '',
+        'sort' => $_GET['sort'] ?? '',
+    ], $over);
+    return BASE_URL . '/admin/tarature.php?' . http_build_query(array_filter($p, fn($v) => $v !== ''));
+}
 
 $page_title = 'Tarature';
 $active_nav = 'tarature';
@@ -119,32 +137,64 @@ require dirname(__DIR__) . '/includes/header_admin.php';
     </div>
 </div>
 
-<!-- Filtri rapidi -->
-<div style="display:flex; gap:8px; margin-bottom:14px; flex-wrap:wrap;">
-    <a href="<?= BASE_URL ?>/admin/tarature.php" class="btn btn-sm <?= !$filter ? 'btn-secondary' : 'btn-ghost' ?>">
-        Tutte <span style="opacity:.6;">(<?= $conteggi['totale'] ?>)</span>
-    </a>
-    <a href="<?= BASE_URL ?>/admin/tarature.php?filter=scadenza"
-        class="btn btn-sm <?= $filter === 'scadenza' ? 'btn-secondary' : 'btn-ghost' ?>"
-        style="<?= $filter === 'scadenza' ? '' : 'color:#f57f17; border-color:#f57f17;' ?>">
-        <i class="fa fa-clock"></i> In scadenza (<?= $conteggi['in_scadenza'] ?>)
-    </a>
-    <a href="<?= BASE_URL ?>/admin/tarature.php?filter=scadute"
-        class="btn btn-sm <?= $filter === 'scadute' ? 'btn-secondary' : 'btn-ghost' ?>"
-        style="<?= $filter === 'scadute' ? '' : 'color:#FF000F; border-color:#FF000F;' ?>">
-        <i class="fa fa-circle-xmark"></i> Scadute (<?= $conteggi['scadute'] ?>)
-    </a>
-    <a href="<?= BASE_URL ?>/admin/tarature.php?filter=nessuna"
-        class="btn btn-sm <?= $filter === 'nessuna' ? 'btn-secondary' : 'btn-ghost' ?>"
-        style="<?= $filter === 'nessuna' ? '' : 'color:#888; border-color:#aaa;' ?>">
-        <i class="fa fa-question-circle"></i> Nessuna (<?= $conteggi['nessuna'] ?>)
-    </a>
+<!-- Filtri rapidi + Ordinamento sulla stessa riga -->
+<div
+    style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px; margin-bottom:14px;">
+
+    <!-- Filtri stato -->
+    <div style="display:flex; gap:8px; flex-wrap:wrap;">
+        <a href="<?= buildUrl(['filter' => '']) ?>" class="btn btn-sm <?= !$filter ? 'btn-secondary' : 'btn-ghost' ?>">
+            Tutte <span style="opacity:.6;">(<?= $conteggi['totale'] ?>)</span>
+        </a>
+        <a href="<?= buildUrl(['filter' => 'scadenza']) ?>"
+            class="btn btn-sm <?= $filter === 'scadenza' ? 'btn-secondary' : 'btn-ghost' ?>"
+            style="<?= $filter === 'scadenza' ? '' : 'color:#f57f17; border-color:#f57f17;' ?>">
+            <i class="fa fa-clock"></i> In scadenza (<?= $conteggi['in_scadenza'] ?>)
+        </a>
+        <a href="<?= buildUrl(['filter' => 'scadute']) ?>"
+            class="btn btn-sm <?= $filter === 'scadute' ? 'btn-secondary' : 'btn-ghost' ?>"
+            style="<?= $filter === 'scadute' ? '' : 'color:#FF000F; border-color:#FF000F;' ?>">
+            <i class="fa fa-circle-xmark"></i> Scadute (<?= $conteggi['scadute'] ?>)
+        </a>
+        <a href="<?= buildUrl(['filter' => 'nessuna']) ?>"
+            class="btn btn-sm <?= $filter === 'nessuna' ? 'btn-secondary' : 'btn-ghost' ?>"
+            style="<?= $filter === 'nessuna' ? '' : 'color:#888; border-color:#aaa;' ?>">
+            <i class="fa fa-question-circle"></i> Nessuna (<?= $conteggi['nessuna'] ?>)
+        </a>
+    </div>
+
+    <!-- Selettore ordinamento -->
+    <div style="display:flex; align-items:center; gap:6px; white-space:nowrap;">
+        <span style="font-size:.78rem; font-weight:600; color:#888; text-transform:uppercase; letter-spacing:.4px;">
+            <i class="fa fa-arrow-up-short-wide"></i> Ordina:
+        </span>
+        <form method="GET" style="display:flex; gap:6px; align-items:center;">
+            <input type="hidden" name="filter" value="<?= e($filter) ?>">
+            <input type="hidden" name="q" value="<?= e($search) ?>">
+            <input type="hidden" name="reparto" value="<?= e($reparto_f) ?>">
+            <input type="hidden" name="macchinario_id" value="<?= e($macchinario_f ?: '') ?>">
+            <select name="sort" class="form-control" style="padding:6px 10px; font-size:.85rem;"
+                onchange="this.form.submit()">
+                <?php foreach ($sort_options as $key => $opt): ?>
+                    <option value="<?= $key ?>" <?= $sort === $key ? 'selected' : '' ?>><?= $opt['label'] ?></option>
+                <?php endforeach; ?>
+            </select>
+            <?php if ($sort !== 'urgenza'): ?>
+                <a href="<?= buildUrl(['sort' => '']) ?>" class="btn btn-ghost btn-sm"
+                    title="Torna all'ordinamento predefinito">
+                    <i class="fa fa-rotate-left"></i>
+                </a>
+            <?php endif; ?>
+        </form>
+    </div>
+
 </div>
 
 <!-- Ricerca -->
 <div class="page-card" style="padding:14px 20px; margin-bottom:16px;">
     <form method="GET" class="search-bar">
         <input type="hidden" name="filter" value="<?= e($filter) ?>">
+        <input type="hidden" name="sort" value="<?= e($sort) ?>">
         <input type="text" name="q" class="form-control" placeholder="Cerca macchinario, seriale, tecnico…"
             value="<?= e($search) ?>" style="max-width:240px;">
         <select name="reparto" class="form-control" style="max-width:180px;">
@@ -167,7 +217,7 @@ require dirname(__DIR__) . '/includes/header_admin.php';
             <i class="fa fa-search"></i> Filtra
         </button>
         <?php if ($search || $reparto_f || $macchinario_f): ?>
-            <a href="<?= BASE_URL ?>/admin/tarature.php<?= $filter ? '?filter=' . $filter : '' ?>"
+            <a href="<?= buildUrl(['q' => '', 'reparto' => '', 'macchinario_id' => '']) ?>"
                 class="btn btn-ghost btn-sm">Reset</a>
         <?php endif; ?>
     </form>
@@ -350,11 +400,7 @@ require dirname(__DIR__) . '/includes/header_admin.php';
             const inner = document.getElementById('storico-inner-' + macId);
             const open = row.style.display !== 'none';
 
-            if (open) {
-                row.style.display = 'none';
-                this.classList.remove('aperto');
-                return;
-            }
+            if (open) { row.style.display = 'none'; this.classList.remove('aperto'); return; }
 
             row.style.display = '';
             this.classList.add('aperto');
