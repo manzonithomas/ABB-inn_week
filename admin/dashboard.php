@@ -19,16 +19,19 @@ $stats = $db->query("
 ")->fetch();
 
 // Macchinari senza tarature
-$senza_tar = (int)$db->query("
+$senza_tar = (int) $db->query("
     SELECT COUNT(*) FROM macchinari m
     WHERE m.attivo = 1
       AND NOT EXISTS (SELECT 1 FROM tarature t WHERE t.macchinario_id = m.id)
 ")->fetchColumn();
 
-// Tarature in scadenza (per la tabella alert)
+// Tarature in scadenza (per la tabella alert) — indipendente da notifica_inviata
 $allerta = $db->query("
-    SELECT * FROM v_tarature_in_scadenza
-    ORDER BY giorni_rimanenti ASC
+    SELECT macchinario_nome, reparto, data_scadenza,
+           giorni_alla_scadenza AS giorni_rimanenti
+    FROM v_ultima_taratura
+    WHERE stato_scadenza = 'in_scadenza'
+    ORDER BY giorni_alla_scadenza ASC
     LIMIT 10
 ")->fetchAll();
 
@@ -94,10 +97,12 @@ require dirname(__DIR__) . '/includes/header_admin.php';
             </div>
         <?php else: ?>
             <?php foreach ($allerta as $a): ?>
-                <div style="display:flex; align-items:center; justify-content:space-between; padding:10px 0; border-bottom:1px solid #f0f0f0;">
+                <div
+                    style="display:flex; align-items:center; justify-content:space-between; padding:10px 0; border-bottom:1px solid #f0f0f0;">
                     <div>
                         <div style="font-weight:700; font-size:.9rem;"><?= e($a['macchinario_nome']) ?></div>
-                        <div class="text-muted"><?= e($a['reparto']) ?> &mdash; scade il <?= fmtDate($a['data_scadenza']) ?></div>
+                        <div class="text-muted"><?= e($a['reparto']) ?> &mdash; scade il <?= fmtDate($a['data_scadenza']) ?>
+                        </div>
                     </div>
                     <span style="font-weight:800; font-size:1.1rem;
                         color: <?= $a['giorni_rimanenti'] <= 7 ? '#FF000F' : '#f57f17' ?>;">
@@ -114,7 +119,9 @@ require dirname(__DIR__) . '/includes/header_admin.php';
             <h2>Stato per reparto</h2>
         </div>
         <?php if (empty($per_reparto)): ?>
-            <div class="empty-state"><p>Nessun dato disponibile.</p></div>
+            <div class="empty-state">
+                <p>Nessun dato disponibile.</p>
+            </div>
         <?php else: ?>
             <div class="table-scroll">
                 <table class="abb-table">
@@ -131,18 +138,23 @@ require dirname(__DIR__) . '/includes/header_admin.php';
                             <tr>
                                 <td>
                                     <a href="<?= BASE_URL ?>/public/reparto.php?reparto=<?= urlencode($r['reparto']) ?>"
-                                       style="color:inherit; font-weight:600;" target="_blank">
+                                        style="color:inherit; font-weight:600;" target="_blank">
                                         <?= e($r['reparto']) ?>
-                                        <i class="fa fa-arrow-up-right-from-square" style="font-size:.7rem; color:#aaa; margin-left:4px;"></i>
+                                        <i class="fa fa-arrow-up-right-from-square"
+                                            style="font-size:.7rem; color:#aaa; margin-left:4px;"></i>
                                     </a>
                                 </td>
                                 <td><?= $r['totale'] ?></td>
                                 <td><?php if ($r['scadute'] > 0): ?>
-                                    <span style="color:#FF000F; font-weight:700;"><?= $r['scadute'] ?></span>
-                                <?php else: echo '0'; endif; ?></td>
+                                        <span style="color:#FF000F; font-weight:700;"><?= $r['scadute'] ?></span>
+                                    <?php else:
+                                    echo '0'; endif; ?>
+                                </td>
                                 <td><?php if ($r['in_scadenza'] > 0): ?>
-                                    <span style="color:#f57f17; font-weight:700;"><?= $r['in_scadenza'] ?></span>
-                                <?php else: echo '0'; endif; ?></td>
+                                        <span style="color:#f57f17; font-weight:700;"><?= $r['in_scadenza'] ?></span>
+                                    <?php else:
+                                    echo '0'; endif; ?>
+                                </td>
                             </tr>
                         <?php endforeach; ?>
                     </tbody>
@@ -166,7 +178,14 @@ require dirname(__DIR__) . '/includes/header_admin.php';
             <div class="table-scroll">
                 <table class="abb-table">
                     <thead>
-                        <tr><th>Macchinario</th><th>Reparto</th><th>Data inserimento</th><th>Scadenza</th><th>Tecnico</th><th>Esito</th></tr>
+                        <tr>
+                            <th>Macchinario</th>
+                            <th>Reparto</th>
+                            <th>Data inserimento</th>
+                            <th>Scadenza</th>
+                            <th>Tecnico</th>
+                            <th>Esito</th>
+                        </tr>
                     </thead>
                     <tbody>
                         <?php foreach ($recenti as $t): ?>
@@ -192,12 +211,33 @@ require dirname(__DIR__) . '/includes/header_admin.php';
 </div>
 
 <style>
-    .esito-pill { display:inline-block; padding:2px 9px; font-size:.75rem; font-weight:700; border-radius:20px; text-transform:uppercase; }
-    .esito-conforme { background:#e8f5e9; color:#2e7d32; }
-    .esito-nc       { background:#ffebee; color:#c62828; }
+    .esito-pill {
+        display: inline-block;
+        padding: 2px 9px;
+        font-size: .75rem;
+        font-weight: 700;
+        border-radius: 20px;
+        text-transform: uppercase;
+    }
+
+    .esito-conforme {
+        background: #e8f5e9;
+        color: #2e7d32;
+    }
+
+    .esito-nc {
+        background: #ffebee;
+        color: #c62828;
+    }
+
     @media (max-width:768px) {
-        .dash-grid { grid-template-columns: 1fr !important; }
-        .dash-grid .page-card { grid-column: span 1 !important; }
+        .dash-grid {
+            grid-template-columns: 1fr !important;
+        }
+
+        .dash-grid .page-card {
+            grid-column: span 1 !important;
+        }
     }
 </style>
 

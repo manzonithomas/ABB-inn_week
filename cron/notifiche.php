@@ -46,6 +46,7 @@ define('SMTP_PASS', '');
 define('SMTP_FROM', 'calibration@abbdalmine.local');
 define('SMTP_NAME', 'ABB Calibration Manager');
 define('SMTP_SECURE', '');  // '' per nessuna crittografia, 'tls' per STARTTLS, 'ssl' per SSL
+define('APP_URL', 'http://localhost/thomas/Abb-tarature');
 
 // ============================================================
 //  MAIN
@@ -200,7 +201,7 @@ function buildEmailHtml(array $t): string
             Accedi al pannello di gestione per aggiornare la taratura prima della scadenza.
           </p>
 
-          <a href="' . BASE_URL . '/admin/tarature.php?filter=scadenza"
+          <a href="' . APP_URL . '/admin/tarature.php?filter=scadenza"
              style="display:inline-block; background:#FF000F; color:#fff; padding:12px 24px;
                     font-weight:700; font-size:.9rem; text-decoration:none; text-transform:uppercase;
                     letter-spacing:.5px;">
@@ -239,7 +240,7 @@ function buildEmailText(array $t): string
     . "Reparto:      {$t['reparto']}\n"
     . "Data scadenza: {$scadenza}\n\n"
     . "Accedi al pannello di gestione per rinnovare la taratura:\n"
-    . BASE_URL . "/admin/tarature.php?filter=scadenza\n\n"
+    . APP_URL . "/admin/tarature.php?filter=scadenza\n\n"
     . str_repeat('-', 50) . "\n"
     . "ABB S.p.A. — Via Luciano Lama 33, 24044 Dalmine (BG)\n"
     . "Email automatica — non rispondere.\n";
