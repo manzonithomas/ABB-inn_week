@@ -594,13 +594,22 @@ try {
             </a>
 
             <div class="sb-section">Gestione</div>
+
+            <a href="<?= BASE_URL ?>/admin/tarature.php"
+                class="sb-link <?= $active_nav === 'tarature' ? 'active' : '' ?>">
+                <i class="fa fa-clipboard-check"></i> Tarature
+            </a>
             <a href="<?= BASE_URL ?>/admin/macchinari.php"
                 class="sb-link <?= $active_nav === 'macchinari' ? 'active' : '' ?>">
                 <i class="fa fa-gears"></i> Macchinari
             </a>
-            <a href="<?= BASE_URL ?>/admin/tarature.php"
-                class="sb-link <?= $active_nav === 'tarature' ? 'active' : '' ?>">
-                <i class="fa fa-clipboard-check"></i> Tarature
+            <a href="<?= BASE_URL ?>/admin/reparti.php"
+                class="sb-link <?= $active_nav === 'reparti' ? 'active' : '' ?>">
+                <i class="fa fa-building"></i> Reparti
+            </a>
+            <a href="<?= BASE_URL ?>/admin/qr_sheet.php"
+                class="sb-link <?= $active_nav === 'Genera QR Code' ? 'active' : '' ?>">
+                <i class="fa fa-qrcode"></i> Genera QR Code
             </a>
 
             <div class="sb-spacer"></div>
