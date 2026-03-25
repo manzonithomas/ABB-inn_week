@@ -4,6 +4,9 @@
 //  Variabili attese:  $page_title  (stringa)
 //                     $active_nav  ('dashboard'|'macchinari'|'tarature'|'impostazioni')
 // ============================================================
+if (!function_exists('sql_tarature_in_scadenza')) {
+    require_once dirname(__FILE__) . '/queries.php';
+}
 $page_title = $page_title ?? 'Admin';
 $active_nav = $active_nav ?? '';
 
@@ -11,7 +14,7 @@ $active_nav = $active_nav ?? '';
 $badge_count = 0;
 try {
     $badge_count = (int) db()->query(
-        "SELECT COUNT(*) FROM v_tarature_in_scadenza"
+        "SELECT COUNT(*) FROM ( " . sql_tarature_in_scadenza() . " )"
     )->fetchColumn();
 } catch (Throwable) {
 }

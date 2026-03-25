@@ -16,6 +16,7 @@
 // if (php_sapi_name() !== 'cli') { http_response_code(403); exit('CLI only.'); }
 
 require_once dirname(__DIR__) . '/config.php';
+require_once dirname(__DIR__) . '/includes/queries.php';
 
 // Carica Composer autoload (PHPMailer)
 $autoload = dirname(__DIR__) . '/vendor/autoload.php';
@@ -58,7 +59,7 @@ $now = date('Y-m-d H:i:s');
 echo "[{$now}] Avvio script notifiche scadenza tarature\n";
 
 // Legge tarature in scadenza non ancora notificate
-$tarature = $db->query("SELECT * FROM v_tarature_in_scadenza")->fetchAll();
+$tarature = $db->query("SELECT * FROM ( " . sql_tarature_in_scadenza() . " )")->fetchAll();
 
 if (empty($tarature)) {
   echo "[OK] Nessuna taratura in scadenza da notificare.\n";

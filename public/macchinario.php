@@ -4,6 +4,7 @@
 //  Mostra l'ultima taratura del macchinario
 // ============================================================
 require_once dirname(__DIR__) . '/config.php';
+require_once dirname(__DIR__) . '/includes/queries.php';
 
 $token = trim($_GET['token'] ?? '');
 
@@ -17,7 +18,7 @@ if ($token === '') {
 }
 
 // Carica macchinario + ultima taratura dalla view
-$stmt = db()->prepare("SELECT * FROM v_ultima_taratura WHERE qr_token = ?");
+$stmt = db()->prepare("SELECT * FROM ( " . sql_ultima_taratura() . " WHERE qr_token = ?");
 $stmt->execute([$token]);
 $data = $stmt->fetch();
 

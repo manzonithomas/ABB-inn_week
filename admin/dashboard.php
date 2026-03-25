@@ -4,6 +4,7 @@
 // ============================================================
 require_once dirname(__DIR__) . '/config.php';
 require_once dirname(__DIR__) . '/includes/auth.php';
+require_once dirname(__DIR__) . '/includes/queries.php';
 requireLogin();
 
 $db = db();
@@ -16,14 +17,14 @@ $stats = $db->query("
         SUM(stato_scadenza = 'in_scadenza') AS in_scadenza,
         SUM(stato_scadenza = 'scaduta')     AS scadute,
         SUM(taratura_id IS NULL)            AS senza_taratura
-    FROM v_ultima_taratura
+    FROM ( " . sql_ultima_taratura() . "
 ")->fetch();
 
 // ---- Tarature in scadenza (lista compatta) ----
 $allerta = $db->query("
     SELECT macchinario_nome, macchinario_id, reparto, data_scadenza,
            giorni_alla_scadenza AS giorni_rimanenti
-    FROM v_ultima_taratura
+    FROM ( " . sql_ultima_taratura() . "
     WHERE stato_scadenza = 'in_scadenza'
     ORDER BY giorni_alla_scadenza ASC
     LIMIT 8
@@ -32,7 +33,7 @@ $allerta = $db->query("
 // ---- Macchinari senza taratura ----
 $senza = $db->query("
     SELECT macchinario_id, macchinario_nome, reparto
-    FROM v_ultima_taratura
+    FROM ( " . sql_ultima_taratura() . "
     WHERE taratura_id IS NULL
     ORDER BY macchinario_nome
     LIMIT 5
@@ -41,7 +42,7 @@ $senza = $db->query("
 // ---- Tutte le scadenze per il calendario (nessun limite di date) ----
 $scadenze_cal = $db->query("
     SELECT data_scadenza, macchinario_nome, stato_scadenza
-    FROM v_ultima_taratura
+    FROM ( " . sql_ultima_taratura() . "
     WHERE data_scadenza IS NOT NULL
     ORDER BY data_scadenza ASC
 ")->fetchAll();

@@ -248,22 +248,6 @@ CREATE TABLE `v_ultima_taratura` (
 -- --------------------------------------------------------
 
 --
--- Struttura per vista `v_tarature_in_scadenza`
---
-DROP TABLE IF EXISTS `v_tarature_in_scadenza`;
-
-CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `v_tarature_in_scadenza`  AS SELECT `t`.`id` AS `taratura_id`, `m`.`nome` AS `macchinario_nome`, `m`.`codice_seriale` AS `codice_seriale`, `r`.`nome` AS `reparto`, `t`.`data_scadenza` AS `data_scadenza`, to_days(`t`.`data_scadenza`) - to_days(curdate()) AS `giorni_rimanenti`, `t`.`notifica_inviata` AS `notifica_inviata`, `a`.`email` AS `email_admin`, `a`.`giorni_preavviso` AS `giorni_preavviso` FROM (((`tarature` `t` join `macchinari` `m` on(`m`.`id` = `t`.`macchinario_id`)) join `reparti` `r` on(`r`.`id` = `m`.`reparto_id`)) join `admin` `a` on(`a`.`id` = 1)) WHERE `t`.`id` in (select max(`tarature`.`id`) from `tarature` group by `tarature`.`macchinario_id`) AND `t`.`data_scadenza` >= curdate() AND to_days(`t`.`data_scadenza`) - to_days(curdate()) <= `a`.`giorni_preavviso` AND `t`.`notifica_inviata` = 0 AND `m`.`attivo` = 1 ;
-
--- --------------------------------------------------------
-
---
--- Struttura per vista `v_ultima_taratura`
---
-DROP TABLE IF EXISTS `v_ultima_taratura`;
-
-CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `v_ultima_taratura`  AS SELECT `m`.`id` AS `macchinario_id`, `m`.`nome` AS `macchinario_nome`, `m`.`codice_seriale` AS `codice_seriale`, `m`.`qr_token` AS `qr_token`, `m`.`intervallo_mesi` AS `intervallo_mesi`, `m`.`tipo_categoria` AS `tipo_categoria`, `m`.`unita_misura` AS `unita_misura`, `r`.`nome` AS `reparto`, `t`.`id` AS `taratura_id`, `t`.`data_inserimento` AS `data_inserimento`, `t`.`data_scadenza` AS `data_scadenza`, `t`.`tecnico` AS `tecnico`, `t`.`ente_certificatore` AS `ente_certificatore`, `t`.`numero_certificato` AS `numero_certificato`, `t`.`esito` AS `esito`, `t`.`note` AS `note`, `t`.`pdf_path` AS `pdf_path`, to_days(`t`.`data_scadenza`) - to_days(curdate()) AS `giorni_alla_scadenza`, CASE WHEN `t`.`data_scadenza` is null THEN NULL WHEN `t`.`data_scadenza` < curdate() THEN 'scaduta' WHEN to_days(`t`.`data_scadenza`) - to_days(curdate()) <= 30 THEN 'in_scadenza' ELSE 'valida' END AS `stato_scadenza` FROM ((`macchinari` `m` join `reparti` `r` on(`r`.`id` = `m`.`reparto_id`)) left join `tarature` `t` on(`t`.`id` = (select `tarature`.`id` from `tarature` where `tarature`.`macchinario_id` = `m`.`id` order by `tarature`.`data_inserimento` desc,`tarature`.`id` desc limit 1))) WHERE `m`.`attivo` = 1 ;
-
---
 -- Indici per le tabelle scaricate
 --
 
