@@ -1,20 +1,82 @@
 # ABB Calibration Manager
 
-Sistema web per la gestione delle tarature dei macchinari — ABB S.p.A. Dalmine.
+Sistema web per la gestione delle tarature dei macchinari, sviluppato in collaborazione con **ABB S.p.A. — Dalmine (BG)**.
+
+Permette di registrare, monitorare e consultare le tarature degli strumenti di misura, con notifiche automatiche in prossimità della scadenza e accesso rapido tramite QR code.
+
+---
+
+## Funzionalità principali
+
+- **Pannello admin** — gestione completa di macchinari, reparti e tarature
+- **QR code** — ogni strumento ha un codice QR univoco: scansionandolo si accede subito alla scheda con lo stato aggiornato (valida / in scadenza / scaduta)
+- **Pagine pubbliche** — consultabili senza login da smartphone, ideali per l'uso in reparto
+- **Alert via email** — notifica automatica all'avvicinarsi della scadenza, configurabile con anticipo personalizzato
+- **Esportazione PDF** — scheda completa dello strumento con storico tarature scaricabile in un click
+- **Dashboard** — statistiche immediate su strumenti scaduti, in scadenza e conformi
 
 ---
 
 ## Stack tecnologico
 
-- **PHP 8.1+** con PDO
-- **MySQL 8.0+ / MariaDB 10.4+**
-- **W3.CSS** + font Barlow (Google Fonts)
-- **phpqrcode** per la generazione dei QR code
-- **PHPMailer** per le email di notifica (via Composer)
+| Componente | Tecnologia |
+|---|---|
+| Backend | PHP 8.1+ con PDO |
+| Database | MySQL 8.0+ / MariaDB 10.4+ |
+| Frontend | W3.CSS + Barlow (Google Fonts) |
+| QR code | phpqrcode |
+| Email | PHPMailer (via Composer) |
+| PDF | FPDF |
 
 ---
 
-## Installazione (XAMPP / locale)
+## Struttura del progetto
+
+```
+calibration_manager/
+├── config.php                  # Configurazione DB, costanti, helper globali
+├── login.php                   # Accesso pannello admin
+├── logout.php
+├── composer.json               # Dipendenze PHP
+├── schema.sql                  # Schema del database
+│
+├── includes/
+│   ├── auth.php                # Gestione sessione admin
+│   ├── header_admin.php        # Layout header area admin
+│   ├── footer_admin.php
+│   ├── header_public.php       # Layout header pagine pubbliche
+│   ├── footer_public.php
+│   └── queries.php             # Funzioni SQL riutilizzabili
+│
+├── admin/
+│   ├── dashboard.php           # Dashboard con statistiche
+│   ├── macchinari.php          # Lista macchinari
+│   ├── macchinario_edit.php    # Aggiunta / modifica macchinario
+│   ├── tarature.php            # Lista tarature
+│   ├── taratura_edit.php       # Aggiunta / modifica taratura
+│   ├── reparti.php             # Gestione reparti
+│   ├── scheda_pdf.php          # Generazione PDF scheda strumento
+│   ├── qr_download.php         # Download QR code PNG
+│   ├── export.php              # Esportazione dati
+│   └── impostazioni.php        # Cambio password e configurazione email
+│
+├── public/
+│   ├── macchinario.php         # Scheda pubblica via QR (per strumento)
+│   └── reparto.php             # Scheda pubblica via QR (per reparto)
+│
+├── cron/
+│   └── notifiche.php           # Script per invio email alert scadenze
+│
+├── lib/
+│   └── phpqrcode/              # Libreria generazione QR code
+│
+└── uploads/
+    └── tarature/               # PDF delle tarature caricati dagli utenti
+```
+
+---
+
+## Installazione in locale (XAMPP)
 
 ### 1. Posiziona il progetto
 ```
@@ -22,151 +84,85 @@ C:\xampp\htdocs\calibration_manager\
 ```
 
 ### 2. Crea il database
-Importa `schema.sql` in phpMyAdmin oppure:
+Apri phpMyAdmin, crea un database chiamato `calibration_manager` e importa il file `schema.sql`.
+
+In alternativa da terminale:
 ```bash
-mysql -u root -p < schema.sql
+mysql -u root < schema.sql
 ```
 
-### 3. Configura
-Apri `config.php` e imposta:
+### 3. Configura `config.php`
 ```php
 define('DB_HOST', 'localhost');
 define('DB_NAME', 'calibration_manager');
 define('DB_USER', 'root');
-define('DB_PASS', '');
-define('BASE_URL', 'http://localhost/calibration_manager');
+define('DB_PASS', '');  // password del tuo XAMPP, di solito vuota
 ```
 
-### 4. Installa PHPMailer (Composer)
+### 4. Installa le dipendenze PHP
 ```bash
 cd calibration_manager
 composer install
 ```
 
-### 5. Installa phpqrcode
-- Scarica da: https://phpqrcode.sourceforge.net/
-- Estrai e posiziona la cartella come `lib/phpqrcode/`
-- Verifica che esista il file `lib/phpqrcode/qrlib.php`
-
-### 6. Permessi cartella uploads
-Assicurati che la cartella `uploads/tarature/` sia scrivibile:
+### 5. Permessi cartella uploads (solo Linux/Mac)
 ```bash
-chmod 755 uploads/tarature/   # Linux/Mac
-# Su Windows con XAMPP di solito non serve
+chmod 755 uploads/tarature/
 ```
 
-### 7. Primo accesso
+### 6. Primo accesso
 - URL: `http://localhost/calibration_manager/login.php`
-- Password default: `changeme123`
-- **Cambia subito la password** da Impostazioni dopo il primo login!
+- Cambia la password al primo accesso da **Impostazioni**
 
 ---
 
-## Struttura cartelle
+## Come funziona il QR code
+
+Ogni macchinario ha un token univoco generato alla creazione. Il QR code codifica un URL del tipo:
 
 ```
-calibration_manager/
-├── config.php                  # Configurazione DB, costanti, helpers
-├── index.php                   # Redirect intelligente
-├── login.php                   # Login admin
-├── logout.php                  # Logout
-├── composer.json               # Dipendenze PHP
-├── schema.sql                  # Schema database
-│
-├── includes/
-│   ├── auth.php                # Gestione sessione admin
-│   ├── header_admin.php        # Layout header pannello admin
-│   ├── footer_admin.php        # Layout footer pannello admin
-│   ├── header_public.php       # Layout header pagine pubbliche
-│   └── footer_public.php       # Layout footer pagine pubbliche
-│
-├── admin/
-│   ├── dashboard.php           # Dashboard con statistiche
-│   ├── macchinari.php          # Lista macchinari
-│   ├── macchinario_edit.php    # Aggiungi / modifica macchinario
-│   ├── tarature.php            # Lista tarature
-│   ├── taratura_edit.php       # Aggiungi / modifica taratura
-│   ├── qr_download.php         # Genera e scarica QR code PNG
-│   └── impostazioni.php        # Cambio password + config email
-│
-├── public/
-│   ├── macchinario.php         # Pagina QR macchinario (pubblica)
-│   └── reparto.php             # Storico reparto (QR ingresso area)
-│
-├── cron/
-│   └── notifiche.php           # Script email alert scadenze
-│
-├── lib/
-│   ├── phpqrcode/              # Libreria QR code (da installare)
-│   │   └── qrlib.php
-│   └── font/
-│       └── Barlow-Bold.ttf     # Font opzionale per QR (da scaricare)
-│
-├── uploads/
-│   └── tarature/               # PDF tarature caricati
-│
-└── vendor/                     # Generato da Composer (non committare)
+https://tuodominio.it/public/macchinario.php?token=XXXXXXXX
 ```
 
----
+Scansionandolo con lo smartphone si accede alla scheda pubblica dello strumento, che mostra l'ultima taratura, lo stato di validità e il PDF allegato — senza bisogno di login.
 
-## QR code: come funziona
-
-Ogni macchinario ha un `qr_token` univoco (stringa hex 64 char).
-
-**QR su macchinario** → punta a:
-```
-http://tuodominio.it/public/macchinario.php?token=XXXXXXXX
-```
-Mostra l'**ultima taratura** con stato (valida/in scadenza/scaduta) e PDF.
-
-**QR all'ingresso reparto** → punta a:
-```
-http://tuodominio.it/public/reparto.php?reparto=Assemblaggio VD4
-```
-Mostra lo **storico di tutti i macchinari** del reparto.
-
-Per scaricare il QR da stampare: Admin → Macchinari → icona QR.
+È previsto anche un QR da apporre all'ingresso di ogni reparto, che elenca tutti gli strumenti del reparto con il loro stato.
 
 ---
 
 ## Email alert (cron job)
 
-### PaperCut (sviluppo locale)
-1. Avvia PaperCut SMTP server
-2. In `cron/notifiche.php` le impostazioni default sono già configurate per PaperCut su `localhost:25`
-3. Test manuale: `php cron/notifiche.php`
+Le notifiche di scadenza vengono inviate dallo script `cron/notifiche.php`, da configurare come cron job sul server:
 
-### Produzione
-Modifica le costanti SMTP in `cron/notifiche.php`:
-```php
-define('SMTP_HOST',   'smtp.tuoprovider.it');
-define('SMTP_PORT',   587);
-define('SMTP_AUTH',   true);
-define('SMTP_USER',   'user@abbdalmine.it');
-define('SMTP_PASS',   'password');
-define('SMTP_SECURE', 'tls');
-```
-
-### Cron job (Linux)
 ```bash
-crontab -e
-# Aggiungi (ogni giorno alle 07:00):
-0 7 * * * php /var/www/html/calibration_manager/cron/notifiche.php >> /var/log/calibration.log 2>&1
+# Ogni giorno alle 07:00
+0 7 * * * php /var/www/html/calibration_manager/cron/notifiche.php
 ```
+
+I parametri SMTP (host, porta, credenziali) si impostano dalla pagina **Impostazioni** del pannello admin. Il numero di giorni di preavviso è anch'esso configurabile.
 
 ---
 
-## Sicurezza (note per produzione)
+## Note sulla sicurezza
 
-- Mettere la cartella `uploads/` fuori dalla webroot, oppure aggiungere un `.htaccess` che blocchi l'esecuzione di PHP nella cartella uploads
-- Abilitare HTTPS
-- Cambiare la password di default `changeme123`
-- Valutare di limitare l'accesso alla cartella `admin/` per IP (`.htaccess`)
+- La cartella `uploads/` contiene solo PDF e non esegue PHP
+- I token QR sono stringhe hex a 64 caratteri generate con `random_bytes()`
+- Tutte le query usano PDO con prepared statements (nessuna concatenazione diretta di input utente)
+- Si consiglia di abilitare HTTPS in produzione
 
 ---
 
 ## Crediti
 
-Progetto scolastico — Classe 5ª Informatica  
-In collaborazione con ABB S.p.A. — Dalmine (BG)
+Progetto realizzato nell'ambito del percorso PCTO (ex alternanza scuola-lavoro)  
+in collaborazione con **ABB S.p.A. — Dalmine (BG)**
+
+| Nome | Classe |
+|---|---|
+| Thomas Manzoni | [classe] |
+| Mattia Esborni | [classe] |
+| Thomas Brattico | [classe] |
+| Luca Cremaschi | [classe] |
+| Syed Raza | [classe] |
+
+A.S. 2024/2025
