@@ -4,6 +4,7 @@
 //  Accessibile tramite QR code all'ingresso dell'area
 // ============================================================
 require_once dirname(__DIR__) . '/config.php';
+require_once dirname(__DIR__) . '/includes/queries.php';
 
 $reparto = trim($_GET['reparto'] ?? '');
 
@@ -41,7 +42,7 @@ if ($reparto === '') {
 
 // ---- Carica macchinari del reparto con ultima taratura ----
 $stmt = db()->prepare("
-    SELECT * FROM v_ultima_taratura
+    SELECT * FROM ( " . sql_ultima_taratura() . "
     WHERE reparto = ?
     ORDER BY stato_scadenza DESC, macchinario_nome ASC
 ");

@@ -5,6 +5,7 @@
 // ============================================================
 require_once dirname(__DIR__) . '/config.php';
 require_once dirname(__DIR__) . '/includes/auth.php';
+require_once dirname(__DIR__) . '/includes/queries.php';
 requireLogin();
 
 $db = db();
@@ -21,7 +22,16 @@ $params = [];
 $where = ['m.attivo = 1'];
 
 if ($filter === 'scadenza') {
-    $where[] = "t.id IN (SELECT taratura_id FROM v_tarature_in_scadenza)";
+    $where[] = "t.id IN (
+        SELECT t2.id FROM tarature t2
+        JOIN macchinari m2 ON m2.id = t2.macchinario_id
+        JOIN admin a ON a.id = 1
+        WHERE t2.id IN (SELECT MAX(id) FROM tarature GROUP BY macchinario_id)
+        AND t2.data_scadenza >= CURDATE()
+        AND DATEDIFF(t2.data_scadenza, CURDATE()) <= a.giorni_preavviso
+        AND t2.notifica_inviata = 0
+        AND m2.attivo = 1
+    )";
 } elseif ($filter === 'scadute') {
     $where[] = "t.data_scadenza < CURRENT_DATE";
 }

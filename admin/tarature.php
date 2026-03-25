@@ -6,6 +6,7 @@
 // ============================================================
 require_once dirname(__DIR__) . '/config.php';
 require_once dirname(__DIR__) . '/includes/auth.php';
+require_once dirname(__DIR__) . '/includes/queries.php';
 requireLogin();
 
 $db = db();
@@ -73,7 +74,7 @@ $sql = "
     SELECT
         vt.*,
         (SELECT COUNT(*) FROM tarature t2 WHERE t2.macchinario_id = vt.macchinario_id) AS n_totale
-    FROM v_ultima_taratura vt
+    FROM ( " . sql_ultima_taratura('vt') . "
     JOIN macchinari m ON m.id = vt.macchinario_id
     JOIN reparti r    ON r.nome = vt.reparto
     WHERE " . implode(' AND ', $where) . "
@@ -91,7 +92,7 @@ $conteggi = $db->query("
         SUM(stato_scadenza = 'in_scadenza') AS in_scadenza,
         SUM(taratura_id IS NULL)            AS nessuna,
         COUNT(*)                            AS totale
-    FROM v_ultima_taratura
+    FROM ( " . sql_ultima_taratura() . "
 ")->fetch();
 
 $reparti = $db->query("SELECT id, nome FROM reparti ORDER BY nome")->fetchAll();

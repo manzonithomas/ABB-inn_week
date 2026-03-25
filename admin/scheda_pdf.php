@@ -10,6 +10,7 @@
 // ============================================================
 require_once dirname(__DIR__) . '/config.php';
 require_once dirname(__DIR__) . '/includes/auth.php';
+require_once dirname(__DIR__) . '/includes/queries.php';
 requireLogin();
 
 $id = (int) ($_GET['id'] ?? 0);
@@ -22,7 +23,7 @@ if ($id === 0) {
 $db = db();
 $stmt = $db->prepare("
     SELECT vt.*, m.tipo_categoria, m.unita_misura, m.intervallo_mesi
-    FROM v_ultima_taratura vt
+    FROM ( " . sql_ultima_taratura('vt') . "
     JOIN macchinari m ON m.id = vt.macchinario_id
     WHERE vt.macchinario_id = ?
 ");
