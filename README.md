@@ -159,10 +159,10 @@ in collaborazione con **ABB S.p.A. — Dalmine (BG)**
 
 | Nome | Classe |
 |---|---|
-| Thomas Manzoni | [classe] |
-| Mattia Esborni | [classe] |
-| Thomas Brattico | [classe] |
-| Luca Cremaschi | [classe] |
-| Syed Raza | [classe] |
+| Thomas Manzoni | 5Ai |
+| Mattia Esborni | 5Ai |
+| Thomas Brattico | 3Ai |
+| Luca Cremaschi | 5Ci |
+| Syed Raza | 4Ai |
 
-A.S. 2024/2025
+A.S. 2025/2026
