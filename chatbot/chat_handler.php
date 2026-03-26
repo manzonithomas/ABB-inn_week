@@ -11,7 +11,7 @@ require_once dirname(__DIR__) . '/includes/auth.php';
 header('Content-Type: application/json; charset=utf-8');
 
 // --- Configurazione Groq ---
-define('GROQ_API_KEY', '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'); 
+define('GROQ_API_KEY', 'CHIEDI_A_GIGI');         
 define('GROQ_MODEL',   'llama-3.1-8b-instant');     // modello gratuito e veloce
 
 // --- Leggi la domanda ---
