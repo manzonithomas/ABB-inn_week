@@ -11,13 +11,15 @@ define('DB_PASS', '');
 define('DB_CHARSET', 'utf8mb4');
 
 // --- URL base (dinamico, senza trailing slash) ---
+/*
 define('BASE_URL', rtrim(
     (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http')
     . '://' . ($_SERVER['HTTP_HOST'] ?? 'localhost')
     . dirname($_SERVER['SCRIPT_NAME']),
     '/admin/public/cron'
 ));
-
+*/
+define('BASE_URL', 'http://localhost/calibration_manager');
 // --- Filesystem ---
 define('ROOT_DIR', __DIR__);
 define('UPLOAD_DIR', ROOT_DIR . '/uploads/tarature/');

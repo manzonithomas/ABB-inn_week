@@ -615,6 +615,11 @@ try {
                 <i class="fa fa-qrcode"></i> Genera QR Code
             </a>
 
+            <a href="<?= BASE_URL ?>/admin/chatbot.php"
+                class="sb-link <?= $active_nav === 'chatbot' ? 'active' : '' ?>">
+                <i class="fa fa-robot"></i> Assistente AI
+            </a>
+
             <div class="sb-spacer"></div>
             <div class="sb-logout">
                 <div class="sb-section">Account</div>
