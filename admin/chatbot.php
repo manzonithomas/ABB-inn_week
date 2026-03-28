@@ -217,6 +217,25 @@ require_once dirname(__DIR__) . '/includes/header_admin.php';
         color: var(--red);
     }
 
+    /* Pulsante PDF nel chatbot */
+    .pdf-download-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        margin-top: 12px;
+        padding: 8px 16px;
+        background: #ff000f;
+        color: #fff !important;
+        border-radius: 4px;
+        font-size: .82rem;
+        font-weight: 700;
+        text-decoration: none !important;
+        transition: background .15s;
+        letter-spacing: .3px;
+    }
+    .pdf-download-btn:hover { background: #cc0000; }
+    .pdf-download-btn i { font-size: .9rem; }
+
     /* Sovrascrivi o aggiungi queste regole */
     .msg.bot .msg-bubble {
         background: #fff;
@@ -270,9 +289,9 @@ Come posso aiutarti?</div>
         <!-- Suggerimenti rapidi -->
         <div class="chat-suggestions" id="suggestions">
             <button class="suggestion-btn" onclick="sendSuggestion(this)">Come aggiungo una taratura?</button>
-            <button class="suggestion-btn" onclick="sendSuggestion(this)">Cosa significa "in scadenza"?</button>
+            <button class="suggestion-btn" onclick="sendSuggestion(this)">Scarica PDF scadenze 30 giorni</button>
+            <button class="suggestion-btn" onclick="sendSuggestion(this)">PDF tutti i macchinari</button>
             <button class="suggestion-btn" onclick="sendSuggestion(this)">Come scarico un QR code?</button>
-            <button class="suggestion-btn" onclick="sendSuggestion(this)">Le email non arrivano</button>
         </div>
 
         <div class="chat-input-area">
@@ -357,6 +376,24 @@ function removeTyping() {
     if (t) t.remove();
 }
 
+
+function addMessageWithPDF(text, pdfUrl, pdfLabel) {
+    const div = document.createElement('div');
+    div.className = 'msg bot';
+    const content = text ? formatAIResponse(text) : '';
+    div.innerHTML = `
+        <div class="msg-avatar"><i class="fa fa-robot"></i></div>
+        <div class="msg-bubble">
+            ${content}
+            <a href="${pdfUrl}" target="_blank" download class="pdf-download-btn">
+                <i class="fa fa-file-pdf-o"></i> ${pdfLabel || 'Scarica PDF'}
+            </a>
+        </div>
+    `;
+    messagesEl.appendChild(div);
+    messagesEl.scrollTop = messagesEl.scrollHeight;
+}
+
 function escapeHtml(str) {
     return str.replace(/[&<>"']/g, function(m) {
         return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#38;' }[m];
@@ -388,6 +425,8 @@ async function sendMessage() {
 
         if (data.error) {
             addMessage('⚠️ Errore: ' + data.error, 'bot');
+        } else if (data.pdf_url) {
+            addMessageWithPDF(data.answer, data.pdf_url, data.pdf_label);
         } else {
             addMessage(data.answer, 'bot');
         }
