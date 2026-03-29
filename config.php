@@ -2,6 +2,7 @@
 // ============================================================
 //  config.php — Configurazione globale
 // ============================================================
+ob_start(); // Bufferizza output per evitare "headers already sent"
 
 // --- Database ---
 define('DB_HOST', 'localhost');

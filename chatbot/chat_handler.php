@@ -12,8 +12,18 @@ require_once dirname(__DIR__) . '/includes/queries.php';
 
 header('Content-Type: application/json; charset=utf-8');
 
-define('GROQ_API_KEY', 'CHIEDI_A_GIGI');
-define('GROQ_MODEL',   'llama-3.1-8b-instant');
+// --- Carica variabili d'ambiente da .env ---
+$env_file = dirname(__DIR__) . '/.env';
+if (file_exists($env_file)) {
+    foreach (file($env_file, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES) as $line) {
+        if (str_starts_with(trim($line), '#') || !str_contains($line, '=')) continue;
+        [$key, $val] = explode('=', $line, 2);
+        $_ENV[trim($key)] = trim($val);
+    }
+}
+
+define('GROQ_API_KEY', $_ENV['GROQ_API_KEY'] ?? '');
+define('GROQ_MODEL',   $_ENV['GROQ_MODEL']   ?? 'llama-3.1-8b-instant');
 
 $input    = json_decode(file_get_contents('php://input'), true);
 $question = trim($input['message'] ?? '');
@@ -47,8 +57,9 @@ function trovaMacchinario(string $testo): ?array
     return null;
 }
 
-$q_lower   = mb_strtolower($question);
-$vuole_pdf = (bool) preg_match('/\b(pdf|genera|scarica|stampa|esporta|download)\b/ui', $question);
+$q_lower     = mb_strtolower($question);
+$vuole_pdf   = (bool) preg_match('/\b(pdf|genera|scarica|stampa|download)\b/ui', $question);
+$vuole_excel = (bool) preg_match('/\b(excel|xlsx|foglio|spreadsheet|esporta)\b/ui', $question);
 
 $giorni = 60;
 if (preg_match('/(\d+)\s*(giorn|gg|days)/ui', $question, $mg))
@@ -56,32 +67,54 @@ if (preg_match('/(\d+)\s*(giorn|gg|days)/ui', $question, $mg))
 
 $pdf_url = $pdf_label = $risposta_fissa = null;
 
-if ($vuole_pdf) {
+// ---- Intent EXCEL ----
+if ($vuole_excel) {
+    $rep = trovaTReparto($question);
+    if ($rep) {
+        $pdf_url        = BASE_URL . '/admin/export_excel.php?tipo=reparto&reparto_id=' . $rep['id'];
+        $pdf_label      = '⬇ Scarica Excel — Reparto ' . $rep['nome'];
+        $risposta_fissa = 'Ecco il file Excel con i macchinari del reparto **' . $rep['nome'] . '**.';
+    } elseif (preg_match('/\b(storico|storia|tutte le tarature|tarature)\b/ui', $question)) {
+        $pdf_url        = BASE_URL . '/admin/export_excel.php?tipo=storico';
+        $pdf_label      = '⬇ Scarica Excel — Storico tarature';
+        $risposta_fissa = 'Ecco il file Excel con lo storico completo di tutte le tarature.';
+    } elseif (str_contains($q_lower, 'scadenz') || str_contains($q_lower, 'scadut')) {
+        $pdf_url        = BASE_URL . '/admin/export_excel.php?tipo=scadenze&giorni=' . $giorni;
+        $pdf_label      = '⬇ Scarica Excel — Scadenze entro ' . $giorni . ' giorni';
+        $risposta_fissa = 'Ecco il file Excel con i macchinari in scadenza entro **' . $giorni . ' giorni**.';
+    } else {
+        $pdf_url        = BASE_URL . '/admin/export_excel.php?tipo=tutti';
+        $pdf_label      = '⬇ Scarica Excel — Tutti i macchinari';
+        $risposta_fissa = 'Ecco il file Excel con la lista completa di tutti i macchinari.';
+    }
+}
+
+// ---- Intent PDF ----
+if ($pdf_url === null && $vuole_pdf) {
     $mac = trovaMacchinario($question);
     if ($mac) {
         $pdf_url        = BASE_URL . '/admin/scheda_pdf.php?id=' . $mac['id'];
-        $pdf_label      = 'Scarica PDF — ' . $mac['nome'];
+        $pdf_label      = '⬇ Scarica PDF — ' . $mac['nome'];
         $risposta_fissa = 'Ho trovato il macchinario **' . $mac['nome'] . '**. Clicca il pulsante per scaricare la scheda PDF con storico tarature.';
     } elseif (str_contains($q_lower, 'reparto')) {
         $rep = trovaTReparto($question);
         if ($rep) {
             $pdf_url        = BASE_URL . '/admin/lista_pdf.php?tipo=reparto&reparto_id=' . $rep['id'];
-            $pdf_label      = 'Scarica PDF — Reparto ' . $rep['nome'];
+            $pdf_label      = '⬇ Scarica PDF — Reparto ' . $rep['nome'];
             $risposta_fissa = 'Ecco la lista macchinari del reparto **' . $rep['nome'] . '**.';
         } else {
             $risposta_fissa = 'Non ho trovato il reparto specificato. Indica il nome esatto del reparto.';
         }
     } elseif (str_contains($q_lower, 'scadenz') || str_contains($q_lower, 'scadut')) {
         $pdf_url        = BASE_URL . '/admin/lista_pdf.php?tipo=scadenze&giorni=' . $giorni;
-        $pdf_label      = 'Scarica PDF — Scadenze entro ' . $giorni . ' giorni';
+        $pdf_label      = '⬇ Scarica PDF — Scadenze entro ' . $giorni . ' giorni';
         $risposta_fissa = 'PDF con macchinari scaduti o in scadenza entro **' . $giorni . ' giorni**.';
     } elseif (preg_match('/\b(tutti|lista|elenco|completa)\b/ui', $question)) {
         $pdf_url        = BASE_URL . '/admin/lista_pdf.php?tipo=tutti';
-        $pdf_label      = 'Scarica PDF — Tutti i macchinari';
+        $pdf_label      = '⬇ Scarica PDF — Tutti i macchinari';
         $risposta_fissa = 'PDF con la lista completa di tutti i macchinari attivi.';
     }
 }
-
 if ($pdf_url !== null) {
     echo json_encode(['answer' => $risposta_fissa, 'pdf_url' => $pdf_url, 'pdf_label' => $pdf_label]);
     exit;
