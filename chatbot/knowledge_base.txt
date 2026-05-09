@@ -1,0 +1,174 @@
+# ABB Calibration Manager — Knowledge Base per l'Assistente AI
+# Questo file contiene tutte le informazioni sul gestionale.
+# Puoi modificarlo e arricchirlo in qualsiasi momento.
+
+## COS'È IL SISTEMA
+ABB Calibration Manager è un gestionale web sviluppato per ABB S.p.A. di Dalmine (BG).
+Serve a tracciare le tarature (calibrazioni) dei macchinari industriali, gestire le scadenze,
+generare QR code da applicare fisicamente ai macchinari e inviare notifiche email agli operatori.
+
+---
+
+## ACCESSO E LOGIN
+- URL di accesso: http://localhost/calibration_manager (reindirizza automaticamente al login)
+- È previsto un unico utente amministratore (il gestore)
+- Password di default iniziale: changeme123 (va cambiata subito al primo accesso)
+- Per cambiare la password: Admin → Impostazioni → sezione "Cambia password"
+- In caso di dimenticanza della password, occorre modificarla direttamente nel database MySQL
+
+---
+
+## STRUTTURA DEL PANNELLO ADMIN
+Il pannello admin è accessibile dopo il login e ha una barra laterale (sidebar) con queste voci:
+
+### Dashboard
+- Mostra statistiche generali: numero totale macchinari, tarature valide, in scadenza, scadute
+- Evidenzia con un badge rosso le tarature in scadenza imminente
+- È la prima pagina che si vede dopo il login
+
+### Macchinari
+- Lista di tutti i macchinari registrati nel sistema
+- Per ogni macchinario si vedono: nome, reparto, matricola, stato dell'ultima taratura
+- Da qui si può: aggiungere un nuovo macchinario, modificare uno esistente, eliminarlo, scaricare il QR code
+- Il QR code di ogni macchinario punta alla pagina pubblica con i dati dell'ultima taratura
+
+### Tarature
+- Lista di tutte le tarature registrate
+- Per ogni taratura si vede: macchinario associato, data taratura, data scadenza, stato, PDF allegato
+- Da qui si può: aggiungere una nuova taratura, modificarne una esistente, eliminarla
+- Si può filtrare per stato (valide / in scadenza / scadute)
+
+### Reparti
+- Lista dei reparti aziendali (es. Assemblaggio VD4, Collaudo, ecc.)
+- Si possono aggiungere, modificare ed eliminare reparti
+- Ogni macchinario appartiene a un reparto
+- Ogni reparto ha un QR code che mostra lo storico di tutti i macchinari di quel reparto
+
+### Genera QR Code
+- Permette di scaricare i QR code in formato PNG pronti per la stampa
+- Si possono generare QR singoli (per macchinario) o fogli multipli (QR sheet)
+
+### Impostazioni
+- Cambio password amministratore
+- Configurazione email per le notifiche (SMTP: host, porta, utente, password)
+
+---
+
+## STATI DELLE TARATURE
+Ogni taratura può trovarsi in uno di questi stati:
+
+- **VALIDA** (verde): la taratura è in corso di validità, non ci sono problemi
+- **IN SCADENZA** (giallo/arancione): la taratura scade entro breve (di solito entro 30 giorni)
+- **SCADUTA** (rosso): la data di scadenza è già passata, il macchinario va ricontrollato
+- **N/D** (grigio): nessuna taratura registrata per quel macchinario
+
+Quando ci sono tarature "in scadenza" o "scadute", appare un badge rosso nella sidebar e nella topbar.
+
+---
+
+## COME AGGIUNGERE UN MACCHINARIO
+1. Vai su Admin → Macchinari
+2. Clicca il pulsante "Aggiungi macchinario"
+3. Compila i campi: nome, reparto (scegli dal menu), matricola/seriale, note opzionali
+4. Salva — il sistema genera automaticamente un QR token univoco per quel macchinario
+
+---
+
+## COME AGGIUNGERE UNA TARATURA
+1. Vai su Admin → Tarature
+2. Clicca "Aggiungi taratura"
+3. Seleziona il macchinario dal menu a tendina
+4. Inserisci: data taratura, data scadenza, ente certificatore (opzionale), note
+5. Allega il PDF del certificato di taratura (facoltativo, max 10 MB)
+6. Salva
+
+---
+
+## COME SCARICARE UN QR CODE
+1. Vai su Admin → Macchinari
+2. Nella riga del macchinario, clicca l'icona QR code
+3. Il sistema genera e scarica un file PNG con il QR code pronto per la stampa
+4. Stampa e applica fisicamente al macchinario
+
+---
+
+## PAGINE PUBBLICHE (senza login)
+Queste pagine sono accessibili a chiunque scansioni il QR code, senza bisogno di fare login:
+
+- **Pagina macchinario**: mostra l'ultima taratura con stato (valida/in scadenza/scaduta) e link al PDF
+  URL: /public/macchinario.php?token=XXXXXXXX
+- **Pagina reparto**: mostra lo storico di tutti i macchinari del reparto
+  URL: /public/reparto.php?reparto=NomeReparto
+
+---
+
+## NOTIFICHE EMAIL (CRON JOB)
+- Il sistema può inviare email automatiche quando una taratura sta per scadere
+- Lo script si trova in: cron/notifiche.php
+- Va eseguito ogni giorno tramite cron job (es. ogni mattina alle 07:00)
+- Configurazione SMTP: nelle Impostazioni del pannello admin oppure direttamente nel file cron/notifiche.php
+- Per test in locale si può usare PaperCut SMTP (porta 25)
+- In produzione usare le credenziali SMTP del provider email aziendale
+
+---
+
+## DATABASE
+- Il sistema usa MySQL/MariaDB
+- Nome database di default: calibration_manager
+- Le tabelle principali sono: macchinari, tarature, reparti
+- Il file schema.sql contiene la struttura completa del database
+- Per importare: usare phpMyAdmin oppure il comando: mysql -u root -p < calibration_manager.sql
+
+---
+
+## STACK TECNICO
+- PHP 8.1+ con PDO per la gestione del database
+- MySQL 8.0 / MariaDB 10.4+
+- W3.CSS per il layout e lo stile (con personalizzazioni ABB in rosso/nero)
+- Font Barlow (Google Fonts)
+- phpqrcode per la generazione dei QR code
+- PHPMailer (via Composer) per le email
+- FontAwesome per le icone
+
+---
+
+## INSTALLAZIONE E CONFIGURAZIONE
+- Il progetto va posizionato in: C:\xampp\htdocs\calibration_manager\ (su Windows con XAMPP)
+- File di configurazione principale: config.php (DB, URL base, percorsi)
+- Dopo aver importato il DB e configurato config.php, avviare Apache e MySQL da XAMPP
+- Installare le dipendenze PHP con: composer install (nella cartella del progetto)
+- Primo accesso: http://localhost/calibration_manager
+
+---
+
+## SICUREZZA
+- Cambiare sempre la password di default (changeme123) al primo accesso
+- In produzione: abilitare HTTPS
+- Considerare di limitare l'accesso alla cartella /admin/ per indirizzo IP tramite .htaccess
+- La cartella uploads/ non dovrebbe essere eseguibile (protezione PHP tramite .htaccess)
+
+---
+
+## PROBLEMI COMUNI E SOLUZIONI
+
+**Non riesco ad accedere dopo il login**
+→ Controlla che la sessione PHP funzioni e che il browser accetti i cookie
+
+**Il QR code non si scarica**
+→ Controlla che la libreria phpqrcode sia presente in lib/phpqrcode/qrlib.php
+
+**Non ricevo le email di notifica**
+→ Verifica le impostazioni SMTP in Impostazioni o in cron/notifiche.php
+→ Assicurati che il cron job sia attivo sul server
+
+**Errore di connessione al database**
+→ Controlla i valori in config.php (DB_HOST, DB_NAME, DB_USER, DB_PASS)
+→ Assicurati che MySQL/MariaDB sia avviato
+
+**Il PDF non si carica**
+→ Controlla che la cartella uploads/tarature/ esista e sia scrivibile
+→ Verifica che il file non superi i 10 MB
+
+**La pagina pubblica mostra "macchinario non trovato"**
+→ Il token nel QR code non corrisponde a nessun macchinario nel DB
+→ Rigenera e ristampa il QR code dal pannello admin

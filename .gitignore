@@ -1,0 +1,33 @@
+# ===== SEGRETI — mai committare =====
+.env
+.env.local
+.env.*.local
+
+# ===== Dipendenze =====
+/vendor/
+
+# ===== Upload utenti =====
+/uploads/tarature/*.pdf
+!/uploads/tarature/.gitkeep
+
+# ===== Cache QR code =====
+/lib/phpqrcode/cache/*.png
+/lib/phpqrcode/cache/*.dat
+/lib/phpqrcode/temp/*
+!/lib/phpqrcode/temp/tempfolder
+
+# ===== Log e file temporanei =====
+*.log
+*.tmp
+*.bak
+
+# ===== OS =====
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ===== IDE =====
+.idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace
