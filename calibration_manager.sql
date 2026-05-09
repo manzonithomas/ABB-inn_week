@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 5.2.1
+-- version 5.2.2deb1+deb13u1
 -- https://www.phpmyadmin.net/
 --
--- Host: 127.0.0.1
--- Creato il: Mar 16, 2026 alle 14:22
--- Versione del server: 10.4.32-MariaDB
--- Versione PHP: 8.0.30
+-- Host: localhost:3306
+-- Creato il: Mag 09, 2026 alle 14:22
+-- Versione del server: 11.8.6-MariaDB-0+deb13u1 from Debian
+-- Versione PHP: 8.4.16
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -66,7 +66,7 @@ CREATE TABLE `macchinari` (
 
 INSERT INTO `macchinari` (`id`, `nome`, `codice_seriale`, `reparto_id`, `tipo_categoria`, `unita_misura`, `intervallo_mesi`, `qr_token`, `attivo`, `created_at`) VALUES
 (1, 'Macchinario_1', 'REP1-001', 1, 'Categoria_A', 'bar', 12, 'a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2', 1, '2026-03-16 11:48:00'),
-(2, 'Macchinario_2', 'REP1-002', 1, 'Categoria_B', 'N', 12, 'b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3', 1, '2026-03-16 11:48:00'),
+(2, 'Macchinario_2a', 'REP1-002', 1, 'Categoria_B', 'N', 12, 'b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3', 1, '2026-03-16 11:48:00'),
 (3, 'Macchinario_3', 'REP1-003', 1, 'Categoria_C', 'N·m', 6, 'c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4', 1, '2026-03-16 11:48:00'),
 (4, 'Macchinario_4', 'REP1-004', 1, 'Categoria_A', 'mm', 12, 'd4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5', 1, '2026-03-16 11:48:00'),
 (5, 'Macchinario_5', 'REP1-005', 1, 'Categoria_A', 'mm', 12, 'e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6', 1, '2026-03-16 11:48:00'),
@@ -138,114 +138,112 @@ CREATE TABLE `tarature` (
 --
 
 INSERT INTO `tarature` (`id`, `macchinario_id`, `data_inserimento`, `data_scadenza`, `tecnico`, `ente_certificatore`, `numero_certificato`, `esito`, `note`, `pdf_path`, `notifica_inviata`, `created_at`) VALUES
-(1, 1, '2022-06-10', '2023-06-10', 'Tecnico_1', 'Ente_1', '2022/E1/0144', 'conforme', '', 'uploads/tarature/esempio.pdf', 1, '2022-06-10 06:00:00'),
-(2, 1, '2023-06-12', '2024-06-12', 'Tecnico_1', 'Ente_1', '2023/E1/0201', 'conforme', '', 'uploads/tarature/esempio.pdf', 1, '2023-06-12 06:00:00'),
-(3, 1, '2024-06-05', '2025-06-05', 'Tecnico_3', 'Ente_1', '2024/E1/0312', 'conforme', '', 'uploads/tarature/esempio.pdf', 1, '2024-06-05 06:00:00'),
-(4, 1, '2025-06-04', '2026-06-04', 'Tecnico_1', 'Ente_1', '2025/E1/0289', 'conforme', 'Nessuna anomalia. Valori nei limiti di tolleranza.', 'uploads/tarature/esempio.pdf', 0, '2025-06-04 06:00:00'),
-(5, 2, '2023-04-05', '2024-04-05', 'Tecnico_2', 'Ente_2', '2023/E2/0056', 'conforme', 'Verificato su banco calibrazione interno.', 'uploads/tarature/esempio.pdf', 1, '2023-04-05 07:00:00'),
-(6, 2, '2024-04-03', '2025-04-03', 'Tecnico_2', 'Ente_2', '2024/E2/0089', 'conforme', '', 'uploads/tarature/esempio.pdf', 1, '2024-04-03 07:00:00'),
-(7, 2, '2025-04-05', '2026-04-05', 'Tecnico_5', 'Ente_2', '2025/E2/0103', 'conforme', '', 'uploads/tarature/esempio.pdf', 1, '2025-04-05 07:00:00'),
-(8, 3, '2023-08-10', '2024-02-10', 'Tecnico_1', 'Ente_1', '2023/E1/0198', 'conforme', '', 'uploads/tarature/esempio.pdf', 1, '2023-08-10 06:00:00'),
-(9, 3, '2024-02-12', '2024-08-12', 'Tecnico_1', 'Ente_1', '2024/E1/0077', 'conforme', '', 'uploads/tarature/esempio.pdf', 1, '2024-02-12 07:00:00'),
-(10, 3, '2024-08-08', '2025-02-08', 'Tecnico_4', 'Ente_1', '2024/E1/0341', 'conforme', '', 'uploads/tarature/esempio.pdf', 1, '2024-08-08 06:00:00'),
-(11, 3, '2025-08-08', '2026-02-08', 'Tecnico_1', 'Ente_1', '2025/E1/0198', 'conforme', '', 'uploads/tarature/esempio.pdf', 1, '2025-08-08 06:00:00'),
-(12, 4, '2023-01-10', '2024-01-10', 'Tecnico_3', 'Ente_3', '2023/E3/0021', 'conforme', '', 'uploads/tarature/esempio.pdf', 1, '2023-01-10 09:00:00'),
-(13, 4, '2024-01-08', '2025-01-08', 'Tecnico_3', 'Ente_3', '2024/E3/0041', 'conforme', '', 'uploads/tarature/esempio.pdf', 1, '2024-01-08 09:00:00'),
-(14, 4, '2025-01-10', '2026-01-10', 'Tecnico_3', 'Ente_3', '2025/E3/0038', 'conforme', 'Calibrazione eseguita con campioni certificati.', 'uploads/tarature/esempio.pdf', 1, '2025-01-10 09:00:00'),
-(15, 6, '2023-03-28', '2024-03-28', 'Tecnico_2', 'Ente_1', '2023/E1/0287', 'conforme', '', 'uploads/tarature/esempio.pdf', 1, '2023-03-28 06:00:00'),
-(16, 6, '2024-03-26', '2025-03-26', 'Tecnico_2', 'Ente_1', '2024/E1/0231', 'conforme', '', 'uploads/tarature/esempio.pdf', 1, '2024-03-26 07:00:00'),
-(17, 6, '2025-03-26', '2026-03-26', 'Tecnico_5', 'Ente_1', '2025/E1/0176', 'conforme', '', 'uploads/tarature/esempio.pdf', 1, '2025-03-26 07:00:00'),
-(18, 7, '2024-08-14', '2025-02-14', 'Tecnico_1', 'Ente_2', '2024/E2/0154', 'non_conforme', 'Errore sistematico oltre tolleranza. Strumento inviato a riparazione.', 'uploads/tarature/esempio.pdf', 1, '2024-08-14 07:00:00'),
-(19, 7, '2025-02-14', '2025-08-14', 'Tecnico_1', 'Ente_2', '2025/E2/0012', 'conforme', 'Ricollaudo post-riparazione: tutti i valori rientrano nelle tolleranze.', 'uploads/tarature/esempio.pdf', 1, '2025-02-14 08:00:00'),
-(20, 7, '2025-08-13', '2026-02-13', 'Tecnico_4', 'Ente_2', '2025/E2/0098', 'conforme', '', 'uploads/tarature/esempio.pdf', 1, '2025-08-13 07:00:00'),
-(21, 7, '2026-02-13', '2026-08-13', 'Tecnico_5', 'Ente_2', '2026/E2/0015', 'conforme', '', 'uploads/tarature/esempio.pdf', 0, '2026-02-13 08:00:00'),
-(22, 8, '2023-03-12', '2024-03-12', 'Tecnico_3', 'Ente_4', '2023/E4/0067', 'conforme', '', 'uploads/tarature/esempio.pdf', 1, '2023-03-12 07:00:00'),
-(23, 8, '2024-03-10', '2025-03-10', 'Tecnico_3', 'Ente_4', '2024/E4/0091', 'conforme', '', 'uploads/tarature/esempio.pdf', 1, '2024-03-10 07:00:00'),
-(24, 8, '2025-03-10', '2026-03-10', 'Tecnico_2', 'Ente_4', '2025/E4/0082', 'conforme', '', 'uploads/tarature/esempio.pdf', 1, '2025-03-10 07:00:00'),
-(25, 9, '2024-05-15', '2025-05-15', 'Tecnico_4', 'Ente_3', '2024/E3/0188', 'conforme', '', 'uploads/tarature/esempio.pdf', 1, '2024-05-15 08:00:00'),
-(26, 9, '2025-05-14', '2026-05-14', 'Tecnico_4', 'Ente_3', '2025/E3/0201', 'conforme', '', 'uploads/tarature/esempio.pdf', 0, '2025-05-14 08:00:00'),
-(27, 10, '2024-06-20', '2025-06-20', 'Tecnico_5', 'Ente_2', '2024/E2/0210', 'conforme', 'Verificato con masse campione certificate.', 'uploads/tarature/esempio.pdf', 1, '2024-06-20 07:00:00'),
+(1, 1, '2025-04-10', '2026-04-10', 'Tecnico_1', 'Ente_1', '2025/E1/0289', 'conforme', '', 'uploads/tarature/esempio.pdf', 1, '2022-06-10 06:00:00'),
+(2, 1, '2025-03-12', '2026-03-12', 'Tecnico_1', 'Ente_1', '2025/E1/0401', 'conforme', '', 'uploads/tarature/esempio.pdf', 1, '2023-06-12 06:00:00'),
+(3, 1, '2025-02-05', '2026-02-05', 'Tecnico_3', 'Ente_1', '2025/E1/0512', 'conforme', '', 'uploads/tarature/esempio.pdf', 1, '2024-06-05 06:00:00'),
+(4, 1, '2025-05-15', '2026-05-15', 'Tecnico_1', 'Ente_1', '2025/E1/0623', 'conforme', 'Nessuna anomalia. Valori nei limiti di tolleranza.', 'uploads/tarature/esempio.pdf', 1, '2025-06-04 06:00:00'),
+(5, 2, '2025-05-20', '2026-05-20', 'Tecnico_2', 'Ente_2', '2025/E2/0103', 'conforme', 'Verificato su banco calibrazione interno.', 'uploads/tarature/esempio.pdf', 1, '2023-04-05 07:00:00'),
+(6, 2, '2025-05-25', '2026-05-25', 'Tecnico_2', 'Ente_2', '2025/E2/0089', 'conforme', '', 'uploads/tarature/esempio.pdf', 1, '2024-04-03 07:00:00'),
+(7, 2, '2025-05-28', '2026-05-28', 'Tecnico_5', 'Ente_2', '2025/E2/0234', 'conforme', '', 'uploads/tarature/esempio.pdf', 1, '2025-04-05 07:00:00'),
+(8, 3, '2025-06-02', '2026-06-02', 'Tecnico_1', 'Ente_1', '2024/E1/0198', 'conforme', '', 'uploads/tarature/esempio.pdf', 1, '2023-08-10 06:00:00'),
+(9, 3, '2025-06-08', '2026-06-08', 'Tecnico_1', 'Ente_1', '2025/E1/0345', 'conforme', '', 'uploads/tarature/esempio.pdf', 1, '2024-02-12 07:00:00'),
+(10, 3, '2025-06-15', '2026-06-15', 'Tecnico_4', 'Ente_1', '2025/E1/0456', 'conforme', '', 'uploads/tarature/esempio.pdf', 0, '2024-08-08 06:00:00'),
+(11, 3, '2025-06-22', '2026-06-22', 'Tecnico_1', 'Ente_1', '2025/E1/0567', 'conforme', '', 'uploads/tarature/esempio.pdf', 0, '2025-08-08 06:00:00'),
+(12, 4, '2025-07-03', '2026-07-03', 'Tecnico_3', 'Ente_3', '2025/E3/0038', 'conforme', '', 'uploads/tarature/esempio.pdf', 0, '2023-01-10 09:00:00'),
+(13, 4, '2025-07-15', '2026-07-15', 'Tecnico_3', 'Ente_3', '2025/E3/0178', 'conforme', '', 'uploads/tarature/esempio.pdf', 0, '2024-01-08 09:00:00'),
+(14, 4, '2025-07-22', '2026-07-22', 'Tecnico_3', 'Ente_3', '2025/E3/0289', 'conforme', 'Calibrazione eseguita con campioni certificati.', 'uploads/tarature/esempio.pdf', 0, '2025-01-10 09:00:00'),
+(15, 6, '2025-07-30', '2026-07-30', 'Tecnico_2', 'Ente_1', '2025/E1/0287', 'conforme', '', 'uploads/tarature/esempio.pdf', 0, '2023-03-28 06:00:00'),
+(16, 6, '2025-08-10', '2026-08-10', 'Tecnico_2', 'Ente_1', '2025/E1/0690', 'conforme', '', 'uploads/tarature/esempio.pdf', 0, '2024-03-26 07:00:00'),
+(17, 6, '2025-08-18', '2026-08-18', 'Tecnico_5', 'Ente_1', '2025/E1/0801', 'conforme', '', 'uploads/tarature/esempio.pdf', 0, '2025-03-26 07:00:00'),
+(18, 7, '2025-08-25', '2026-08-25', 'Tecnico_1', 'Ente_2', '2024/E2/0154', 'non_conforme', 'Errore sistematico oltre tolleranza. Strumento inviato a riparazione.', 'uploads/tarature/esempio.pdf', 0, '2024-08-14 07:00:00'),
+(19, 7, '2025-09-05', '2026-09-05', 'Tecnico_1', 'Ente_2', '2025/E2/0012', 'conforme', 'Ricollaudo post-riparazione: tutti i valori rientrano nelle tolleranze.', 'uploads/tarature/esempio.pdf', 0, '2025-02-14 08:00:00'),
+(20, 7, '2025-09-15', '2026-09-15', 'Tecnico_4', 'Ente_2', '2025/E2/0912', 'conforme', '', 'uploads/tarature/esempio.pdf', 0, '2025-08-13 07:00:00'),
+(21, 7, '2025-09-25', '2026-09-25', 'Tecnico_5', 'Ente_2', '2026/E2/0015', 'conforme', '', 'uploads/tarature/esempio.pdf', 0, '2026-02-13 08:00:00'),
+(22, 8, '2025-10-05', '2026-10-05', 'Tecnico_3', 'Ente_4', '2025/E4/0067', 'conforme', '', 'uploads/tarature/esempio.pdf', 0, '2023-03-12 07:00:00'),
+(23, 8, '2025-10-15', '2026-10-15', 'Tecnico_3', 'Ente_4', '2025/E4/0123', 'conforme', '', 'uploads/tarature/esempio.pdf', 0, '2024-03-10 07:00:00'),
+(24, 8, '2025-10-25', '2026-10-25', 'Tecnico_2', 'Ente_4', '2025/E4/0234', 'conforme', '', 'uploads/tarature/esempio.pdf', 0, '2025-03-10 07:00:00'),
+(25, 9, '2025-11-05', '2026-11-05', 'Tecnico_4', 'Ente_3', '2025/E3/0345', 'conforme', '', 'uploads/tarature/esempio.pdf', 0, '2024-05-15 08:00:00'),
+(26, 9, '2025-05-14', '2026-05-14', 'Tecnico_4', 'Ente_3', '2025/E3/0201', 'conforme', '', 'uploads/tarature/esempio.pdf', 1, '2025-05-14 08:00:00'),
+(27, 10, '2024-06-20', '2026-07-20', 'Tecnico_5', 'Ente_2', '2024/E2/0210', 'conforme', 'Verificato con masse campione certificate.', 'uploads/tarature/esempio.pdf', 0, '2024-06-20 07:00:00'),
 (28, 10, '2025-06-18', '2026-06-18', 'Tecnico_5', 'Ente_2', '2025/E2/0198', 'conforme', '', 'uploads/tarature/esempio.pdf', 0, '2025-06-18 07:00:00'),
-(29, 11, '2023-02-16', '2023-08-16', 'Tecnico_3', 'Ente_3', '2023/E3/0078', 'conforme', '', 'uploads/tarature/esempio.pdf', 1, '2023-02-16 09:00:00'),
-(30, 11, '2023-08-15', '2024-02-15', 'Tecnico_3', 'Ente_3', '2023/E3/0201', 'conforme', '', 'uploads/tarature/esempio.pdf', 1, '2023-08-15 08:00:00'),
-(31, 11, '2024-02-15', '2024-08-15', 'Tecnico_1', 'Ente_3', '2024/E3/0055', 'conforme', '', 'uploads/tarature/esempio.pdf', 1, '2024-02-15 09:00:00'),
-(32, 11, '2025-02-15', '2025-08-15', 'Tecnico_3', 'Ente_3', '2025/E3/0078', 'conforme', '', 'uploads/tarature/esempio.pdf', 1, '2025-02-15 09:00:00'),
-(33, 12, '2024-07-20', '2025-01-20', 'Tecnico_3', 'Ente_5', '2024/E5/0034', 'conforme', 'Calibrazione presso centro autorizzato.', 'uploads/tarature/esempio.pdf', 1, '2024-07-20 08:00:00'),
-(34, 12, '2025-01-20', '2025-07-20', 'Tecnico_4', 'Ente_5', '2025/E5/0011', 'conforme', '', 'uploads/tarature/esempio.pdf', 1, '2025-01-20 09:00:00'),
+(29, 11, '2023-02-16', '2026-08-16', 'Tecnico_3', 'Ente_3', '2023/E3/0078', 'conforme', '', 'uploads/tarature/esempio.pdf', 0, '2023-02-16 09:00:00'),
+(30, 11, '2023-08-15', '2026-02-15', 'Tecnico_3', 'Ente_3', '2023/E3/0201', 'conforme', '', 'uploads/tarature/esempio.pdf', 1, '2023-08-15 08:00:00'),
+(31, 11, '2024-02-15', '2026-08-15', 'Tecnico_1', 'Ente_3', '2024/E3/0055', 'conforme', '', 'uploads/tarature/esempio.pdf', 0, '2024-02-15 09:00:00'),
+(32, 11, '2025-02-15', '2026-08-15', 'Tecnico_3', 'Ente_3', '2025/E3/0078', 'conforme', '', 'uploads/tarature/esempio.pdf', 0, '2025-02-15 09:00:00'),
+(33, 12, '2024-07-20', '2026-01-20', 'Tecnico_3', 'Ente_5', '2024/E5/0034', 'conforme', 'Calibrazione presso centro autorizzato.', 'uploads/tarature/esempio.pdf', 1, '2024-07-20 08:00:00'),
+(34, 12, '2025-01-20', '2026-07-20', 'Tecnico_4', 'Ente_5', '2025/E5/0011', 'conforme', '', 'uploads/tarature/esempio.pdf', 0, '2025-01-20 09:00:00'),
 (35, 12, '2025-07-20', '2026-01-20', 'Tecnico_3', 'Ente_5', '2025/E5/0089', 'conforme', '', 'uploads/tarature/esempio.pdf', 1, '2025-07-20 08:00:00'),
-(36, 13, '2024-04-10', '2025-04-10', 'Tecnico_5', 'Ente_2', '2024/E2/0321', 'conforme', '', 'uploads/tarature/esempio.pdf', 1, '2024-04-10 07:00:00'),
+(36, 13, '2024-04-10', '2026-04-10', 'Tecnico_5', 'Ente_2', '2024/E2/0321', 'conforme', '', 'uploads/tarature/esempio.pdf', 1, '2024-04-10 07:00:00'),
 (37, 13, '2025-04-10', '2026-04-10', 'Tecnico_5', 'Ente_2', '2025/E2/0287', 'conforme', '', 'uploads/tarature/esempio.pdf', 1, '2025-04-10 07:00:00'),
-(38, 14, '2024-09-05', '2025-09-05', 'Tecnico_2', 'Ente_5', '2024/E5/0211', 'conforme', '', 'uploads/tarature/esempio.pdf', 1, '2024-09-05 07:00:00'),
+(38, 14, '2024-09-05', '2026-09-05', 'Tecnico_2', 'Ente_5', '2024/E5/0211', 'conforme', '', 'uploads/tarature/esempio.pdf', 0, '2024-09-05 07:00:00'),
 (39, 14, '2025-09-03', '2026-09-03', 'Tecnico_2', 'Ente_5', '2025/E5/0198', 'conforme', 'Verifica range esteso. Nessuna deriva rilevata.', 'uploads/tarature/esempio.pdf', 0, '2025-09-03 07:00:00'),
-(40, 15, '2024-09-03', '2025-03-03', 'Tecnico_1', 'Ente_1', '2024/E1/0401', 'conforme', '', 'uploads/tarature/esempio.pdf', 1, '2024-09-03 06:00:00'),
-(41, 15, '2025-03-01', '2025-09-01', 'Tecnico_1', 'Ente_1', '2025/E1/0144', 'conforme', '', 'uploads/tarature/esempio.pdf', 1, '2025-03-01 07:00:00'),
+(40, 15, '2024-09-03', '2026-03-03', 'Tecnico_1', 'Ente_1', '2024/E1/0401', 'conforme', '', 'uploads/tarature/esempio.pdf', 1, '2024-09-03 06:00:00'),
+(41, 15, '2025-03-01', '2026-09-01', 'Tecnico_1', 'Ente_1', '2025/E1/0144', 'conforme', '', 'uploads/tarature/esempio.pdf', 0, '2025-03-01 07:00:00'),
 (42, 15, '2025-09-01', '2026-03-01', 'Tecnico_4', 'Ente_1', '2025/E1/0389', 'conforme', '', 'uploads/tarature/esempio.pdf', 1, '2025-09-01 06:00:00'),
-(43, 16, '2024-05-20', '2025-05-20', 'Tecnico_5', 'Ente_4', '2024/E4/0178', 'conforme', '', 'uploads/tarature/esempio.pdf', 1, '2024-05-20 07:00:00'),
+(43, 16, '2024-05-20', '2026-05-20', 'Tecnico_5', 'Ente_4', '2024/E4/0178', 'conforme', '', 'uploads/tarature/esempio.pdf', 0, '2024-05-20 07:00:00'),
 (44, 16, '2025-05-19', '2026-05-19', 'Tecnico_5', 'Ente_4', '2025/E4/0201', 'conforme', '', 'uploads/tarature/esempio.pdf', 0, '2025-05-19 07:00:00'),
 (45, 17, '2022-06-01', '2024-06-01', 'Tecnico_3', 'Ente_3', '2022/E3/0301', 'conforme', 'Taratura biennale.', 'uploads/tarature/esempio.pdf', 1, '2022-06-01 08:00:00'),
 (46, 17, '2024-06-03', '2026-06-03', 'Tecnico_3', 'Ente_3', '2024/E3/0412', 'conforme', 'Taratura biennale. Verifica assi X, Y, Z. Tutti i parametri conformi.', 'uploads/tarature/esempio.pdf', 0, '2024-06-03 08:00:00'),
-(47, 18, '2024-07-10', '2025-07-10', 'Tecnico_2', 'Ente_2', '2024/E2/0099', 'conforme', '', 'uploads/tarature/esempio.pdf', 1, '2024-07-10 07:00:00'),
+(47, 18, '2024-07-10', '2026-07-10', 'Tecnico_2', 'Ente_2', '2024/E2/0099', 'conforme', '', 'uploads/tarature/esempio.pdf', 0, '2024-07-10 07:00:00'),
 (48, 18, '2025-07-09', '2026-07-09', 'Tecnico_2', 'Ente_2', '2025/E2/0311', 'conforme', '', 'uploads/tarature/esempio.pdf', 0, '2025-07-09 07:00:00'),
-(49, 19, '2024-08-22', '2025-08-22', 'Tecnico_5', 'Ente_2', '2024/E2/0267', 'conforme', '', 'uploads/tarature/esempio.pdf', 1, '2024-08-22 07:00:00'),
+(49, 19, '2024-08-22', '2026-08-22', 'Tecnico_5', 'Ente_2', '2024/E2/0267', 'conforme', '', 'uploads/tarature/esempio.pdf', 0, '2024-08-22 07:00:00'),
 (50, 19, '2025-08-20', '2026-08-20', 'Tecnico_5', 'Ente_2', '2025/E2/0354', 'conforme', '', 'uploads/tarature/esempio.pdf', 0, '2025-08-20 07:00:00'),
 (51, 20, '2024-03-30', '2024-09-30', 'Tecnico_4', 'Ente_2', '2024/E2/0134', 'conforme', '', 'uploads/tarature/esempio.pdf', 1, '2024-03-30 08:00:00'),
-(52, 20, '2024-09-28', '2025-03-28', 'Tecnico_4', 'Ente_2', '2024/E2/0289', 'conforme', '', 'uploads/tarature/esempio.pdf', 1, '2024-09-28 07:00:00'),
-(53, 20, '2025-09-28', '2026-03-28', 'Tecnico_1', 'Ente_2', '2025/E2/0401', 'conforme', '', 'uploads/tarature/esempio.pdf', 1, '2025-09-28 07:00:00'),
-(54, 21, '2024-10-14', '2025-10-14', 'Tecnico_2', 'Ente_4', '2024/E4/0344', 'conforme', '', 'uploads/tarature/esempio.pdf', 1, '2024-10-14 07:00:00'),
+(52, 20, '2024-09-28', '2026-03-28', 'Tecnico_4', 'Ente_2', '2024/E2/0289', 'conforme', '', 'uploads/tarature/esempio.pdf', 1, '2024-09-28 07:00:00'),
+(53, 20, '2025-09-28', '2026-03-28', 'Tecnico_1', 'Ente_2', '2025/E2/0401', 'non_conforme', '', 'uploads/tarature/esempio.pdf', 0, '2025-09-28 07:00:00'),
+(54, 21, '2024-10-14', '2026-10-14', 'Tecnico_2', 'Ente_4', '2024/E4/0344', 'conforme', '', 'uploads/tarature/esempio.pdf', 0, '2024-10-14 07:00:00'),
 (55, 21, '2025-10-13', '2026-10-13', 'Tecnico_2', 'Ente_4', '2025/E4/0388', 'conforme', '', 'uploads/tarature/esempio.pdf', 0, '2025-10-13 07:00:00'),
-(56, 22, '2024-11-05', '2025-11-05', 'Tecnico_4', 'Ente_1', '2024/E1/0499', 'conforme', '', 'uploads/tarature/esempio.pdf', 1, '2024-11-05 07:00:00'),
+(56, 22, '2024-11-05', '2026-11-05', 'Tecnico_4', 'Ente_1', '2024/E1/0499', 'conforme', '', 'uploads/tarature/esempio.pdf', 0, '2024-11-05 07:00:00'),
 (57, 22, '2025-11-04', '2026-11-04', 'Tecnico_4', 'Ente_1', '2025/E1/0412', 'conforme', '', 'uploads/tarature/esempio.pdf', 0, '2025-11-04 07:00:00'),
 (58, 23, '2023-02-10', '2024-02-10', 'Tecnico_1', 'Ente_1', '2023/E1/0112', 'conforme', '', 'uploads/tarature/esempio.pdf', 1, '2023-02-10 07:00:00'),
-(59, 23, '2024-02-09', '2025-02-09', 'Tecnico_1', 'Ente_1', '2024/E1/0098', 'conforme', '', 'uploads/tarature/esempio.pdf', 1, '2024-02-09 07:00:00'),
+(59, 23, '2024-02-09', '2026-02-09', 'Tecnico_1', 'Ente_1', '2024/E1/0098', 'conforme', '', 'uploads/tarature/esempio.pdf', 1, '2024-02-09 07:00:00'),
 (60, 23, '2025-02-09', '2026-02-09', 'Tecnico_1', 'Ente_1', '2025/E1/0112', 'conforme', '', 'uploads/tarature/esempio.pdf', 1, '2025-02-09 07:00:00');
 
 -- --------------------------------------------------------
 
 --
--- Struttura stand-in per le viste `v_tarature_in_scadenza`
--- (Vedi sotto per la vista effettiva)
+-- Struttura della tabella `v_tarature_in_scadenza`
 --
+
 CREATE TABLE `v_tarature_in_scadenza` (
-`taratura_id` int(10) unsigned
-,`macchinario_nome` varchar(150)
-,`codice_seriale` varchar(100)
-,`reparto` varchar(100)
-,`data_scadenza` date
-,`giorni_rimanenti` int(7)
-,`notifica_inviata` tinyint(1)
-,`email_admin` varchar(255)
-,`giorni_preavviso` tinyint(3) unsigned
-);
+  `taratura_id` int(10) UNSIGNED DEFAULT NULL,
+  `macchinario_nome` varchar(150) DEFAULT NULL,
+  `codice_seriale` varchar(100) DEFAULT NULL,
+  `reparto` varchar(100) DEFAULT NULL,
+  `data_scadenza` date DEFAULT NULL,
+  `giorni_rimanenti` int(7) DEFAULT NULL,
+  `notifica_inviata` tinyint(1) DEFAULT NULL,
+  `email_admin` varchar(255) DEFAULT NULL,
+  `giorni_preavviso` tinyint(3) UNSIGNED DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
 
 -- --------------------------------------------------------
 
 --
--- Struttura stand-in per le viste `v_ultima_taratura`
--- (Vedi sotto per la vista effettiva)
+-- Struttura della tabella `v_ultima_taratura`
 --
+
 CREATE TABLE `v_ultima_taratura` (
-`macchinario_id` int(10) unsigned
-,`macchinario_nome` varchar(150)
-,`codice_seriale` varchar(100)
-,`qr_token` char(64)
-,`intervallo_mesi` tinyint(3) unsigned
-,`tipo_categoria` varchar(100)
-,`unita_misura` varchar(50)
-,`reparto` varchar(100)
-,`taratura_id` int(10) unsigned
-,`data_inserimento` date
-,`data_scadenza` date
-,`tecnico` varchar(150)
-,`ente_certificatore` varchar(150)
-,`numero_certificato` varchar(100)
-,`esito` enum('conforme','non_conforme')
-,`note` text
-,`pdf_path` varchar(500)
-,`giorni_alla_scadenza` int(7)
-,`stato_scadenza` varchar(11)
-);
-
--- --------------------------------------------------------
+  `macchinario_id` int(10) UNSIGNED DEFAULT NULL,
+  `macchinario_nome` varchar(150) DEFAULT NULL,
+  `codice_seriale` varchar(100) DEFAULT NULL,
+  `qr_token` char(64) DEFAULT NULL,
+  `intervallo_mesi` tinyint(3) UNSIGNED DEFAULT NULL,
+  `tipo_categoria` varchar(100) DEFAULT NULL,
+  `unita_misura` varchar(50) DEFAULT NULL,
+  `reparto` varchar(100) DEFAULT NULL,
+  `taratura_id` int(10) UNSIGNED DEFAULT NULL,
+  `data_inserimento` date DEFAULT NULL,
+  `data_scadenza` date DEFAULT NULL,
+  `tecnico` varchar(150) DEFAULT NULL,
+  `ente_certificatore` varchar(150) DEFAULT NULL,
+  `numero_certificato` varchar(100) DEFAULT NULL,
+  `esito` enum('conforme','non_conforme') DEFAULT NULL,
+  `note` text DEFAULT NULL,
+  `pdf_path` varchar(500) DEFAULT NULL,
+  `giorni_alla_scadenza` int(7) DEFAULT NULL,
+  `stato_scadenza` varchar(11) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
 
 --
 -- Indici per le tabelle scaricate
