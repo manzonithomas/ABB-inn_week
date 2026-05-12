@@ -59,7 +59,7 @@ $now = date('Y-m-d H:i:s');
 echo "[{$now}] Avvio script notifiche scadenza tarature\n";
 
 // Legge tarature in scadenza non ancora notificate
-$tarature = $db->query("SELECT * FROM ( " . sql_tarature_in_scadenza() . " )")->fetchAll();
+$tarature = $db->query("SELECT * FROM ( " . sql_tarature_in_scadenza())->fetchAll();
 
 if (empty($tarature)) {
   echo "[OK] Nessuna taratura in scadenza da notificare.\n";
