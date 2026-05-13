@@ -24,6 +24,124 @@ Il progetto è hostato su un **Raspberry Pi** all'interno della rete scolastica.
 
 ---
 
+## Anteprima del sistema
+
+### Login
+
+<p align="center">
+  <img src="doc/screenshots/login.png" alt="Schermata di login" style="max-width: 800px; width: 100%; height: auto;">
+</p>
+
+### Dashboard amministrazione
+
+<p align="center">
+  <img src="doc/screenshots/dashboard.png" alt="Dashboard con statistiche e calendario scadenze" style="max-width: 800px; width: 100%; height: auto;">
+</p>
+
+La dashboard mostra immediatamente lo stato di tutti i macchinari: quanti sono a norma, quanti in scadenza e quanti scaduti. Il calendario colorato permette di pianificare gli interventi.
+
+### Gestione tarature
+
+<p align="center">
+  <img src="doc/screenshots/tarature.png" alt="Pagina tarature con filtri e storico" style="max-width: 800px; width: 100%; height: auto;">
+</p>
+
+Ogni riga mostra l'ultima taratura per macchinario. I filtri rapidi permettono di isolare subito le urgenze. Cliccando su "Storico" si espande la riga con le tarature precedenti e i PDF scaricabili.
+
+### Gestione macchinari
+
+<p align="center">
+  <img src="doc/screenshots/macchinari.png" alt="Lista macchinari con ricerca" style="max-width: 800px; width: 100%; height: auto;">
+</p>
+
+Per ogni macchinario è possibile scaricare il QR code singolo, la scheda PDF completa o accedere alla modifica.
+
+---
+
+## Come funziona il QR code
+
+Ogni macchinario ha un token univoco di 64 caratteri hex generato con `random_bytes()` alla creazione. Il QR code codifica un URL del tipo:
+
+```
+https://php.progettothomas.it/abb/public/macchinario.php?token=XXXXXXXX
+```
+
+Scansionandolo con lo smartphone si accede alla scheda pubblica dello strumento:
+
+<p align="center">
+  <img src="doc/screenshots/qr_macchinario.png" alt="Scheda pubblica accessibile via QR code da smartphone" style="max-width: 300px; width: 100%; height: auto;">
+</p>
+
+La pagina mostra:
+- Stato della taratura (valida / in scadenza / scaduta) con indicazione dei giorni rimanenti
+- Dettagli dell'ultima taratura (tecnico, ente certificatore, numero certificato, esito)
+- Download del PDF del certificato
+- Storico delle tarature precedenti con relativi PDF
+
+**I PDF sono dinamici:** la pagina legge sempre dal database, quindi se viene registrata una nuova taratura lo stato si aggiorna istantaneamente senza dover rigenerare o ristampare i QR code.
+
+### QR per reparto
+
+<p align="center">
+  <img src="doc/screenshots/qr_reparto.png" alt="Vista reparto con stato di tutti i macchinari" style="max-width: 300px; width: 100%; height: auto;">
+</p>
+
+È previsto anche un QR da apporre all'ingresso di ogni reparto, che elenca tutti gli strumenti con il loro stato.
+
+### Generazione fogli QR
+
+<p align="center">
+  <img src="doc/screenshots/qr_sheet.png" alt="Selezione macchinari per generazione foglio QR" style="max-width: 800px; width: 100%; height: auto;">
+</p>
+
+Si selezionano i macchinari desiderati e si genera un PDF pronto per la stampa con 12 QR code per pagina A4.
+
+### Scheda strumento PDF
+
+<p align="center">
+  <img src="doc/screenshots/scheda_pdf.png" alt="PDF scheda completa del macchinario con storico tarature" style="max-width: 800px; width: 100%; height: auto;">
+</p>
+
+PDF scaricabile con tutti i dati dello strumento, la tariffa corrente e lo storico completo delle tarature passate.
+
+### Assistente IA
+
+<p align="center">
+  <img src="doc/screenshots/chatbot.png" alt="Chatbot assistente integrato nel pannello admin" style="max-width: 800px; width: 100%; height: auto;">
+</p>
+
+Chatbot powered by Groq e Llama 3 che risponde a domande sul funzionamento del sistema e può generare PDF su richiesta.
+
+---
+
+## Flessibilità e integrazione
+
+L'architettura è pensata per essere adattabile:
+- Il file `config.php` contiene tutta la configurazione della connessione al database: è sufficiente modificare le costanti per collegarsi a un database esterno
+- Se i certificati di taratura sono già memorizzati in un database interno ABB, è possibile modificare le query in `includes/queries.php` per leggerli direttamente, senza stravolgere la struttura dell'applicazione
+- Le notifiche email sono indipendenti e configurabili tramite la pagina Impostazioni
+
+---
+
+## Email alert (cron job)
+
+Le notifiche di scadenza vengono inviate dallo script `cron/notifiche.php`, da configurare come cron job sul server:
+
+```bash
+# Ogni giorno alle 07:00
+0 7 * * * php /var/www/html/calibration_manager/cron/notifiche.php >> /var/log/calibration_notifiche.log 2>&1
+```
+
+Lo script invia una **email** ogni volta che una taratura va in stato di 'in scadenza'
+
+<p align="center">
+  <img src="doc/screenshots/email.png" alt="Email di scadenza ricevuta in PaperCut" style="max-width: 500px; width: 100%; height: auto;">
+</p>
+
+I parametri SMTP (host, porta, credenziali) si impostano direttamente nello script `cron/notifiche.php`. Il numero di giorni di preavviso è configurabile dalla pagina **Impostazioni** del pannello admin.
+
+---
+
 ## Stack tecnologico
 
 | Componente | Tecnologia                                        |
@@ -97,49 +215,6 @@ calibration_manager/
 ```
 
 ---
-
-## Come funziona il QR code
-
-Ogni macchinario ha un token univoco di 64 caratteri hex generato con `random_bytes()` alla creazione. Il QR code codifica un URL del tipo:
-
-```
-https://php.progettothomas.it/abb/public/macchinario.php?token=XXXXXXXX
-```
-
-Scansionandolo con lo smartphone si accede alla scheda pubblica dello strumento, che mostra:
-- Stato della taratura (valida / in scadenza / scaduta) con indicazione dei giorni rimanenti
-- Dettagli dell'ultima taratura (tecnico, ente certificatore, numero certificato, esito)
-- Download del PDF del certificato
-- Storico delle tarature precedenti con relativi PDF
-
-**I PDF sono dinamici:** la pagina legge sempre dal database, quindi se viene registrata una nuova taratura lo stato si aggiorna istantaneamente senza dover rigenerare o ristampare i QR code.
-
-È previsto anche un QR da apporre all'ingresso di ogni reparto (`public/reparto.php`), che elenca tutti gli strumenti del reparto con il loro stato.
-
----
-
-## Flessibilità e integrazione
-
-L'architettura è pensata per essere adattabile:
-- Il file `config.php` contiene tutta la configurazione della connessione al database: è sufficiente modificare le costanti per collegarsi a un database esterno
-- Se i certificati di taratura sono già memorizzati in un database interno ABB, è possibile modificare le query in `includes/queries.php` per leggerli direttamente, senza stravolgere la struttura dell'applicazione
-- Le notifiche email sono indipendenti e configurabili tramite la pagina Impostazioni
-
----
-
-## Email alert (cron job)
-
-Le notifiche di scadenza vengono inviate dallo script `cron/notifiche.php`, da configurare come cron job sul server:
-
-```bash
-# Ogni giorno alle 07:00
-0 7 * * * php /var/www/html/calibration_manager/cron/notifiche.php >> /var/log/calibration_notifiche.log 2>&1
-```
-
-I parametri SMTP (host, porta, credenziali) si impostano direttamente nello script `cron/notifiche.php`. Il numero di giorni di preavviso è configurabile dalla pagina **Impostazioni** del pannello admin.
-
----
-
 ## Installazione
 
 ### Requisiti
@@ -164,9 +239,8 @@ mysql -u root -p < calibration_manager.sql
 ```php
 define('DB_HOST', 'localhost');
 define('DB_NAME', 'calibration_manager');
-define('DB_USER', 'nome_utente');
-define('DB_PASS', 'tua_password');
-(di solito è nome utente 'root' con password vuota)
+define('DB_USER', 'root');
+define('DB_PASS', '');  // di solito vuota su XAMPP
 ```
 
 ### 4. Installa le dipendenze
@@ -199,7 +273,7 @@ chmod 755 uploads/tarature/
 
 ## Crediti
 
-Progetto realizzato nell'ambito del percorso **Info12** in collaborazione con **ABB S.p.A. — Dalmine (BG)**
+Progetto realizzato nell'ambito del percorso **Info12** in collaborazione con **ABB S.p.A. — Dalmine (BG)** e il gruppo **Info13**
 
 | Nome            | Classe |
 | --------------- | ------ |
