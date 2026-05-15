@@ -7,20 +7,31 @@ ob_start(); // Bufferizza output per evitare "headers already sent"
 // --- Database ---
 define('DB_HOST', 'localhost');
 define('DB_NAME', 'calibration_manager');
-define('DB_USER', 'root');
-define('DB_PASS', '');
+define('DB_USER', 'abb-user');
+define('DB_PASS', 'abbpsw345');
 define('DB_CHARSET', 'utf8mb4');
 
-// --- URL base (dinamico, senza trailing slash) ---
-/*
-define('BASE_URL', rtrim(
-    (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http')
-    . '://' . ($_SERVER['HTTP_HOST'] ?? 'localhost')
-    . dirname($_SERVER['SCRIPT_NAME']),
-    '/admin/public/cron'
-));
-*/
-define('BASE_URL', 'http://localhost/calibration_manager');
+// --- URL base (dinamico infallibile con supporto Proxy/Cloudflare) ---
+$protocol = 'http';
+if (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') {
+    $protocol = 'https';
+} elseif (!empty($_SERVER['HTTP_X_FORWARDED_PROTO']) && strtolower($_SERVER['HTTP_X_FORWARDED_PROTO']) === 'https') {
+    $protocol = 'https';
+} elseif (!empty($_SERVER['HTTP_X_FORWARDED_SSL']) && $_SERVER['HTTP_X_FORWARDED_SSL'] === 'on') {
+    $protocol = 'https';
+} elseif (!empty($_SERVER['SERVER_PORT']) && $_SERVER['SERVER_PORT'] == 443) {
+    $protocol = 'https';
+}
+
+$host = $_SERVER['HTTP_HOST'] ?? 'localhost';
+
+// Confronta il percorso del file corrente con la root del web server
+$docRoot = str_replace('\\', '/', realpath($_SERVER['DOCUMENT_ROOT']));
+$currentDir = str_replace('\\', '/', realpath(__DIR__));
+$subfolder = str_replace($docRoot, '', $currentDir);
+
+define('BASE_URL', rtrim($protocol . '://' . $host . $subfolder, '/'));
+
 // --- Filesystem ---
 define('ROOT_DIR', __DIR__);
 define('UPLOAD_DIR', ROOT_DIR . '/uploads/tarature/');

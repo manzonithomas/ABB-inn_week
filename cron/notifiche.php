@@ -47,7 +47,7 @@ define('SMTP_PASS', '');
 define('SMTP_FROM', 'calibration@abbdalmine.local');
 define('SMTP_NAME', 'ABB Calibration Manager');
 define('SMTP_SECURE', '');  // '' per nessuna crittografia, 'tls' per STARTTLS, 'ssl' per SSL
-define('APP_URL', 'http://localhost/thomas/Abb-tarature');
+define('APP_URL', 'http://localhost/thomas/abb');
 
 // ============================================================
 //  MAIN
@@ -59,7 +59,7 @@ $now = date('Y-m-d H:i:s');
 echo "[{$now}] Avvio script notifiche scadenza tarature\n";
 
 // Legge tarature in scadenza non ancora notificate
-$tarature = $db->query("SELECT * FROM ( " . sql_tarature_in_scadenza() . " )")->fetchAll();
+$tarature = $db->query("SELECT * FROM ( " . sql_tarature_in_scadenza())->fetchAll();
 
 if (empty($tarature)) {
   echo "[OK] Nessuna taratura in scadenza da notificare.\n";
