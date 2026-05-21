@@ -157,6 +157,14 @@ I parametri SMTP (host, porta, credenziali) si impostano direttamente nello scri
 
 ---
 
+## Schema Database
+
+<p align="center">
+  <img src="diagram.svg" alt="Diagramma E/R del database">
+</p>
+
+Il database è composto da tre tabelle principali legate in cascata: **Reparti** → **Macchinari** → **Tarature**. La tabella `admin` è isolata e gestisce esclusivamente le credenziali di accesso e i parametri per le notifiche email.
+
 ## Struttura del progetto
 
 ```
