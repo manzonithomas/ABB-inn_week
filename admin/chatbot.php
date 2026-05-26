@@ -52,7 +52,6 @@ require_once dirname(__DIR__) . '/includes/header_admin.php';
     }
 
     .chat-header .sorint-badge {
-        margin-left: auto;
         background: var(--s-orange);
         color: #fff;
         font-size: .68rem;
@@ -147,7 +146,26 @@ require_once dirname(__DIR__) . '/includes/header_admin.php';
     .msg-bubble li            { margin-bottom: 5px; }
     .msg-bubble strong        { font-weight: 700; color: #1a2a4a; }
 
-    /* ── Typing dots ─────────────────────────────────────────── */
+    #reset-btn {
+        margin-left: auto;
+        background: transparent;
+        border: 1px solid rgba(255,255,255,.25);
+        color: rgba(255,255,255,.7);
+        font-family: 'Barlow', sans-serif;
+        font-size: .75rem;
+        font-weight: 600;
+        padding: 4px 10px;
+        border-radius: 3px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        transition: background .15s, color .15s;
+    }
+    #reset-btn:hover {
+        background: rgba(255,255,255,.12);
+        color: #fff;
+    }
     .typing-indicator {
         display: flex;
         gap: 5px;
@@ -293,6 +311,9 @@ require_once dirname(__DIR__) . '/includes/header_admin.php';
             <div class="ai-dot"></div>
             Assistente ABB Calibration Manager
             <span class="sorint-badge">Sorint.lab</span>
+            <button id="reset-btn" onclick="resetChat()" title="Pulisci chat">
+                <i class="fa fa-rotate-left"></i> Reset
+            </button>
         </div>
 
         <div class="chat-messages" id="chat-messages">
@@ -350,7 +371,6 @@ inputEl.addEventListener('keydown', function (e) {
 
 function sendSuggestion(btn) {
     inputEl.value = btn.textContent;
-    suggestEl.style.display = 'none';
     sendMessage();
 }
 
@@ -416,11 +436,28 @@ function escapeHtml(str) {
     });
 }
 
+function resetChat() {
+    messagesEl.innerHTML = `
+        <div class="msg bot">
+            <div class="msg-avatar"><i class="fa fa-robot"></i></div>
+            <div class="msg-bubble">Ciao! Sono l'assistente del gestionale <strong>ABB Calibration Manager</strong>, realizzato da <strong>Sorint.lab</strong> nell'ambito del programma <strong>Lock &amp; Learn</strong>.
+
+Posso aiutarti con domande su:
+• Come usare le funzioni del sistema
+• Gestione macchinari e tarature
+• Configurazione email e QR code
+• Risoluzione di problemi comuni
+
+Come posso aiutarti?</div>
+        </div>`;
+    inputEl.value = '';
+    inputEl.style.height = 'auto';
+    inputEl.focus();
+}
+
 async function sendMessage() {
     const text = inputEl.value.trim();
     if (!text) return;
-
-    suggestEl.style.display = 'none';
 
     addMessage(text, 'user');
     inputEl.value = '';
