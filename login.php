@@ -323,9 +323,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         .student-name {
             font-weight: 600;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
         }
 
         .student-class {
@@ -390,23 +387,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <div class="company-title">Info12 — ABB Dalmine</div>
                         <ul class="student-list">
                             <li class="student-item">
-                                <span class="student-name">T. Manzoni</span>
+                                <span class="student-name">Thomas Manzoni</span>
                                 <span class="student-class">5Ai</span>
                             </li>
                             <li class="student-item">
-                                <span class="student-name">M. Esborni</span>
+                                <span class="student-name">Mattia Esborni</span>
                                 <span class="student-class">5Ai</span>
                             </li>
                             <li class="student-item">
-                                <span class="student-name">L. Cremaschi</span>
+                                <span class="student-name">Luca Cremaschi</span>
                                 <span class="student-class">5Ci</span>
                             </li>
                             <li class="student-item">
-                                <span class="student-name">T. Brattico</span>
+                                <span class="student-name">Thomas Brattico</span>
                                 <span class="student-class">3Ai</span>
                             </li>
                             <li class="student-item">
-                                <span class="student-name">S. Raza</span>
+                                <span class="student-name">Syed Raza</span>
                                 <span class="student-class">4Ai</span>
                             </li>
                         </ul>
@@ -416,23 +413,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <div class="company-title">Info13 — SORINT Lab</div>
                         <ul class="student-list">
                             <li class="student-item">
-                                <span class="student-name">L. Mascioli</span>
+                                <span class="student-name">Luigi Mascioli</span>
                                 <span class="student-class">5Ai</span>
                             </li>
                             <li class="student-item">
-                                <span class="student-name">A. Alfieri</span>
+                                <span class="student-name">Andrea Alfieri</span>
                                 <span class="student-class">5Ai</span>
                             </li>
                             <li class="student-item">
-                                <span class="student-name">U. Iqbal</span>
+                                <span class="student-name">Umar Iqbal</span>
                                 <span class="student-class">5Ci</span>
                             </li>
                             <li class="student-item">
-                                <span class="student-name">D. Serughetti</span>
+                                <span class="student-name">Denis Serughetti</span>
                                 <span class="student-class">4Ai</span>
                             </li>
                             <li class="student-item">
-                                <span class="student-name">A. Carrara</span>
+                                <span class="student-name">Alessandro Carrara</span>
                                 <span class="student-class">3Ai</span>
                             </li>
                         </ul>
