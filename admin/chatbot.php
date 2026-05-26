@@ -12,24 +12,34 @@ require_once dirname(__DIR__) . '/includes/header_admin.php';
 ?>
 
 <style>
+    /* ── Sorint palette override (solo in questa pagina) ──────── */
     .chat-wrap {
+        --s-blue:   #0d2340;
+        --s-blue2:  #1a3a6e;
+        --s-orange: #f47920;
+        --s-orange2:#d96510;
+        --s-light:  #eef2f8;
+        --s-border: #d0d8e8;
+
         max-width: 780px;
         margin: 0 auto;
     }
 
     .chat-box {
         background: #fff;
-        border-radius: 2px;
-        box-shadow: 0 1px 4px rgba(0,0,0,.08);
+        border-radius: 4px;
+        box-shadow: 0 2px 12px rgba(13,35,64,.13);
         display: flex;
         flex-direction: column;
         height: calc(100vh - 180px);
         min-height: 420px;
         overflow: hidden;
+        border-top: 3px solid var(--s-orange);
     }
 
+    /* ── Header ─────────────────────────────────────────────── */
     .chat-header {
-        background: var(--dark);
+        background: var(--s-blue);
         color: #fff;
         padding: 14px 20px;
         display: flex;
@@ -39,6 +49,17 @@ require_once dirname(__DIR__) . '/includes/header_admin.php';
         font-size: .95rem;
         letter-spacing: .3px;
         flex-shrink: 0;
+    }
+
+    .chat-header .sorint-badge {
+        background: var(--s-orange);
+        color: #fff;
+        font-size: .68rem;
+        font-weight: 800;
+        padding: 2px 9px;
+        border-radius: 20px;
+        letter-spacing: .8px;
+        text-transform: uppercase;
     }
 
     .chat-header .ai-dot {
@@ -55,6 +76,7 @@ require_once dirname(__DIR__) . '/includes/header_admin.php';
         50%       { opacity: .4; }
     }
 
+    /* ── Messages area ───────────────────────────────────────── */
     .chat-messages {
         flex: 1;
         overflow-y: auto;
@@ -62,7 +84,7 @@ require_once dirname(__DIR__) . '/includes/header_admin.php';
         display: flex;
         flex-direction: column;
         gap: 14px;
-        background: #f8f8f8;
+        background: var(--s-light);
     }
 
     .msg {
@@ -94,35 +116,56 @@ require_once dirname(__DIR__) . '/includes/header_admin.php';
         font-weight: 700;
     }
 
-    .msg.bot  .msg-avatar { background: var(--red); color: #fff; }
-    .msg.user .msg-avatar { background: var(--dark); color: #fff; }
+    .msg.bot  .msg-avatar { background: var(--s-orange); color: #fff; }
+    .msg.user .msg-avatar { background: var(--s-blue);   color: #fff; }
 
     .msg-bubble {
         padding: 11px 15px;
-        border-radius: 2px;
+        border-radius: 4px;
         font-size: .9rem;
         line-height: 1.6;
         white-space: pre-wrap;
     }
 
-    .msg.bot  .msg-bubble {
+    .msg.bot .msg-bubble {
         background: #fff;
-        border: 1px solid var(--border);
-        border-left: 3px solid var(--red);
+        border: 1px solid var(--s-border);
+        border-left: 3px solid var(--s-orange);
+        white-space: normal;
     }
 
     .msg.user .msg-bubble {
-        background: var(--dark);
+        background: var(--s-blue);
         color: #fff;
     }
 
-    .msg-bubble ul {
-        margin: 6px 0 0 0;
-        padding-left: 18px;
+    .msg-bubble p             { margin-bottom: 10px; }
+    .msg-bubble p:last-child  { margin-bottom: 0; }
+    .msg-bubble ul,
+    .msg-bubble ol            { margin: 10px 0; padding-left: 20px; }
+    .msg-bubble li            { margin-bottom: 5px; }
+    .msg-bubble strong        { font-weight: 700; color: #1a2a4a; }
+
+    #reset-btn {
+        margin-left: auto;
+        background: transparent;
+        border: 1px solid rgba(255,255,255,.25);
+        color: rgba(255,255,255,.7);
+        font-family: 'Barlow', sans-serif;
+        font-size: .75rem;
+        font-weight: 600;
+        padding: 4px 10px;
+        border-radius: 3px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        transition: background .15s, color .15s;
     }
-
-    .msg-bubble li { margin-bottom: 3px; }
-
+    #reset-btn:hover {
+        background: rgba(255,255,255,.12);
+        color: #fff;
+    }
     .typing-indicator {
         display: flex;
         gap: 5px;
@@ -133,7 +176,7 @@ require_once dirname(__DIR__) . '/includes/header_admin.php';
     .typing-indicator span {
         width: 7px;
         height: 7px;
-        background: #ccc;
+        background: var(--s-orange);
         border-radius: 50%;
         animation: bounce .9s infinite;
     }
@@ -146,8 +189,9 @@ require_once dirname(__DIR__) . '/includes/header_admin.php';
         30%            { transform: translateY(-6px); }
     }
 
+    /* ── Input area ──────────────────────────────────────────── */
     .chat-input-area {
-        border-top: 1px solid var(--border);
+        border-top: 1px solid var(--s-border);
         padding: 14px 16px;
         background: #fff;
         display: flex;
@@ -158,10 +202,10 @@ require_once dirname(__DIR__) . '/includes/header_admin.php';
     #chat-input {
         flex: 1;
         padding: 10px 14px;
-        border: 1.5px solid var(--border);
+        border: 1.5px solid var(--s-border);
         font-family: 'Barlow', sans-serif;
         font-size: .92rem;
-        border-radius: 1px;
+        border-radius: 3px;
         resize: none;
         transition: border-color .15s;
         max-height: 120px;
@@ -170,11 +214,11 @@ require_once dirname(__DIR__) . '/includes/header_admin.php';
 
     #chat-input:focus {
         outline: none;
-        border-color: var(--red);
+        border-color: var(--s-orange);
     }
 
     #send-btn {
-        background: var(--red);
+        background: var(--s-orange);
         color: #fff;
         border: none;
         padding: 0 20px;
@@ -182,7 +226,7 @@ require_once dirname(__DIR__) . '/includes/header_admin.php';
         font-weight: 700;
         font-size: .9rem;
         cursor: pointer;
-        border-radius: 1px;
+        border-radius: 3px;
         transition: background .15s;
         display: flex;
         align-items: center;
@@ -190,9 +234,10 @@ require_once dirname(__DIR__) . '/includes/header_admin.php';
         white-space: nowrap;
     }
 
-    #send-btn:hover:not(:disabled) { background: var(--red-dark); }
+    #send-btn:hover:not(:disabled) { background: var(--s-orange2); }
     #send-btn:disabled { opacity: .5; cursor: not-allowed; }
 
+    /* ── Suggestions ─────────────────────────────────────────── */
     .chat-suggestions {
         padding: 0 20px 10px;
         display: flex;
@@ -202,29 +247,30 @@ require_once dirname(__DIR__) . '/includes/header_admin.php';
 
     .suggestion-btn {
         background: #fff;
-        border: 1px solid var(--border);
-        color: var(--mid);
+        border: 1px solid var(--s-border);
+        color: var(--s-blue2);
         font-family: 'Barlow', sans-serif;
         font-size: .78rem;
         padding: 5px 12px;
         border-radius: 20px;
         cursor: pointer;
-        transition: border-color .15s, color .15s;
+        transition: border-color .15s, color .15s, background .15s;
     }
 
     .suggestion-btn:hover {
-        border-color: var(--red);
-        color: var(--red);
+        border-color: var(--s-orange);
+        color: var(--s-orange);
+        background: #fff8f2;
     }
 
-    /* Pulsante PDF nel chatbot */
+    /* ── PDF / Excel download button ─────────────────────────── */
     .pdf-download-btn {
         display: inline-flex;
         align-items: center;
         gap: 7px;
         margin-top: 12px;
         padding: 8px 16px;
-        background: #ff000f;
+        background: var(--s-orange);
         color: #fff !important;
         border-radius: 4px;
         font-size: .82rem;
@@ -233,34 +279,30 @@ require_once dirname(__DIR__) . '/includes/header_admin.php';
         transition: background .15s;
         letter-spacing: .3px;
     }
-    .pdf-download-btn:hover { background: #cc0000; }
-    .pdf-download-btn i { font-size: .9rem; }
+    .pdf-download-btn:hover { background: var(--s-orange2); }
+    .pdf-download-btn i     { font-size: .9rem; }
 
-    /* Sovrascrivi o aggiungi queste regole */
-    .msg.bot .msg-bubble {
-        background: #fff;
-        border: 1px solid var(--border);
-        border-left: 3px solid var(--red);
-        white-space: normal; /* IMPORTANTE: permette al browser di gestire i paragrafi HTML */
+    /* ── Page header tweak ───────────────────────────────────── */
+    .sorint-powered {
+        font-size: .78rem;
+        color: #666;
+        display: flex;
+        align-items: center;
+        gap: 6px;
     }
-
-    /* Formattazione elementi dentro la risposta dell'AI */
-    .msg-bubble p { margin-bottom: 10px; }
-    .msg-bubble p:last-child { margin-bottom: 0; }
-    .msg-bubble ul, .msg-bubble ol { 
-        margin: 10px 0; 
-        padding-left: 20px; 
-    }
-    .msg-bubble li { margin-bottom: 5px; }
-    .msg-bubble strong { font-weight: 700; color: #333; }
-
+    .sorint-powered strong { color: var(--s-orange); }
 </style>
+
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
 <div class="chat-wrap">
     <div class="page-header">
-        <h2><i class="fa fa-robot" style="color:var(--red)"></i> Assistente AI</h2>
-        <span class="text-muted" style="font-size:.82rem;">
-            Powered by Groq · Llama 3 · Gratuito
+        <h2><i class="fa fa-robot" style="color:#f47920"></i> Assistente AI</h2>
+        <span class="sorint-powered">
+            Sviluppato nell'ambito del progetto
+            <strong>Lock &amp; Learn</strong>
+            · <span style="color:#0d2340;font-weight:700">Sorint.lab</span>
+            · Powered by Groq &amp; Llama 3
         </span>
     </div>
 
@@ -268,13 +310,17 @@ require_once dirname(__DIR__) . '/includes/header_admin.php';
         <div class="chat-header">
             <div class="ai-dot"></div>
             Assistente ABB Calibration Manager
+            <span class="sorint-badge">Sorint.lab</span>
+            <button id="reset-btn" onclick="resetChat()" title="Pulisci chat">
+                <i class="fa fa-rotate-left"></i> Reset
+            </button>
         </div>
 
         <div class="chat-messages" id="chat-messages">
             <!-- Messaggio di benvenuto -->
             <div class="msg bot">
                 <div class="msg-avatar"><i class="fa fa-robot"></i></div>
-                <div class="msg-bubble">Ciao! Sono l'assistente del gestionale ABB Calibration Manager.
+                <div class="msg-bubble">Ciao! Sono l'assistente del gestionale <strong>ABB Calibration Manager</strong>, realizzato da <strong>Sorint.lab</strong> nell'ambito del programma <strong>Lock &amp; Learn</strong>.
 
 Posso aiutarti con domande su:
 • Come usare le funzioni del sistema
@@ -325,27 +371,18 @@ inputEl.addEventListener('keydown', function (e) {
 
 function sendSuggestion(btn) {
     inputEl.value = btn.textContent;
-    suggestEl.style.display = 'none';
     sendMessage();
 }
 
 function formatAIResponse(text) {
-    // marked.parse trasforma il Markdown in HTML
-    // Usiamo mangle: false e headerIds: false per evitare warning nelle versioni recenti
-    return marked.parse(text, {
-        mangle: false,
-        headerIds: false
-    });
+    return marked.parse(text, { mangle: false, headerIds: false });
 }
 
 function addMessage(text, role) {
     const icon  = role === 'user' ? 'fa-user' : 'fa-robot';
     const div   = document.createElement('div');
     div.className = 'msg ' + role;
-    
-    // Se è il bot, formattiamo il Markdown. Se è l'utente, mostriamo testo semplice.
     const content = role === 'bot' ? formatAIResponse(text) : escapeHtml(text);
-    
     div.innerHTML = `
         <div class="msg-avatar"><i class="fa ${icon}"></i></div>
         <div class="msg-bubble">${content}</div>
@@ -376,7 +413,6 @@ function removeTyping() {
     if (t) t.remove();
 }
 
-
 function addMessageWithPDF(text, pdfUrl, pdfLabel) {
     const div = document.createElement('div');
     div.className = 'msg bot';
@@ -400,12 +436,28 @@ function escapeHtml(str) {
     });
 }
 
+function resetChat() {
+    messagesEl.innerHTML = `
+        <div class="msg bot">
+            <div class="msg-avatar"><i class="fa fa-robot"></i></div>
+            <div class="msg-bubble">Ciao! Sono l'assistente del gestionale <strong>ABB Calibration Manager</strong>, realizzato da <strong>Sorint.lab</strong> nell'ambito del programma <strong>Lock &amp; Learn</strong>.
+
+Posso aiutarti con domande su:
+• Come usare le funzioni del sistema
+• Gestione macchinari e tarature
+• Configurazione email e QR code
+• Risoluzione di problemi comuni
+
+Come posso aiutarti?</div>
+        </div>`;
+    inputEl.value = '';
+    inputEl.style.height = 'auto';
+    inputEl.focus();
+}
+
 async function sendMessage() {
     const text = inputEl.value.trim();
     if (!text) return;
-
-    // Nasconde suggerimenti dopo la prima domanda
-    suggestEl.style.display = 'none';
 
     addMessage(text, 'user');
     inputEl.value = '';
