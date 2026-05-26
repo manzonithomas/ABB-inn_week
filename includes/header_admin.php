@@ -156,6 +156,23 @@ try {
             flex: 1;
         }
 
+        /* ── Sorint chatbot nav item ──────────────────────── */
+        .sb-link.sb-chatbot {
+            color: #7ab3f0;
+        }
+        .sb-link.sb-chatbot:hover {
+            background: #0d2340;
+            color: #fff;
+        }
+        .sb-link.sb-chatbot.active {
+            background: #0d2340;
+            color: #fff;
+            border-left: 3px solid #f47920;
+        }
+        .sb-link.sb-chatbot .fa {
+            color: #f47920;
+        }
+
         .sb-logout {
             border-top: 1px solid #2f2f2f;
             padding: 4px 0 8px;
@@ -616,7 +633,7 @@ try {
             </a>
 
             <a href="<?= BASE_URL ?>/admin/chatbot.php"
-                class="sb-link <?= $active_nav === 'chatbot' ? 'active' : '' ?>">
+                class="sb-link sb-chatbot <?= $active_nav === 'chatbot' ? 'active' : '' ?>">
                 <i class="fa fa-robot"></i> Assistente AI
             </a>
 

@@ -205,17 +205,7 @@ INSERT INTO `tarature` (`id`, `macchinario_id`, `data_inserimento`, `data_scaden
 -- Struttura della tabella `v_tarature_in_scadenza`
 --
 
-CREATE TABLE `v_tarature_in_scadenza` (
-  `taratura_id` int(10) UNSIGNED DEFAULT NULL,
-  `macchinario_nome` varchar(150) DEFAULT NULL,
-  `codice_seriale` varchar(100) DEFAULT NULL,
-  `reparto` varchar(100) DEFAULT NULL,
-  `data_scadenza` date DEFAULT NULL,
-  `giorni_rimanenti` int(7) DEFAULT NULL,
-  `notifica_inviata` tinyint(1) DEFAULT NULL,
-  `email_admin` varchar(255) DEFAULT NULL,
-  `giorni_preavviso` tinyint(3) UNSIGNED DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
+
 
 -- --------------------------------------------------------
 
@@ -223,27 +213,7 @@ CREATE TABLE `v_tarature_in_scadenza` (
 -- Struttura della tabella `v_ultima_taratura`
 --
 
-CREATE TABLE `v_ultima_taratura` (
-  `macchinario_id` int(10) UNSIGNED DEFAULT NULL,
-  `macchinario_nome` varchar(150) DEFAULT NULL,
-  `codice_seriale` varchar(100) DEFAULT NULL,
-  `qr_token` char(64) DEFAULT NULL,
-  `intervallo_mesi` tinyint(3) UNSIGNED DEFAULT NULL,
-  `tipo_categoria` varchar(100) DEFAULT NULL,
-  `unita_misura` varchar(50) DEFAULT NULL,
-  `reparto` varchar(100) DEFAULT NULL,
-  `taratura_id` int(10) UNSIGNED DEFAULT NULL,
-  `data_inserimento` date DEFAULT NULL,
-  `data_scadenza` date DEFAULT NULL,
-  `tecnico` varchar(150) DEFAULT NULL,
-  `ente_certificatore` varchar(150) DEFAULT NULL,
-  `numero_certificato` varchar(100) DEFAULT NULL,
-  `esito` enum('conforme','non_conforme') DEFAULT NULL,
-  `note` text DEFAULT NULL,
-  `pdf_path` varchar(500) DEFAULT NULL,
-  `giorni_alla_scadenza` int(7) DEFAULT NULL,
-  `stato_scadenza` varchar(11) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
+
 
 --
 -- Indici per le tabelle scaricate
