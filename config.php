@@ -7,8 +7,10 @@ ob_start(); // Bufferizza output per evitare "headers already sent"
 // --- Database ---
 define('DB_HOST', 'localhost');
 define('DB_NAME', 'calibration_manager');
-define('DB_USER', 'abb-user');
-define('DB_PASS', 'abbpsw345');
+define('DB_USER', 'root');
+define('DB_PASS', '');
+//define('DB_USER', 'abb-user');
+//define('DB_PASS', 'abbpsw345');
 define('DB_CHARSET', 'utf8mb4');
 
 // --- URL base (dinamico infallibile con supporto Proxy/Cloudflare) ---
